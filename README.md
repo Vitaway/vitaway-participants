@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vitaway Employee Portal
 
-## Getting Started
+A comprehensive Employee Dashboard for a multi-tenant health platform built with Next.js 16, React 19, and TypeScript.
 
-First, run the development server:
+## 🚀 Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📋 Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Dashboard Home** - Overview of health metrics, goals, and appointments
+- **Health Overview** - Track vitals (BMI, Weight, Blood Pressure, Glucose)
+- **Goals & Progress** - Monitor exercise, nutrition, and health goals
+- **Programs & Learning** - Access wellness programs and educational content
+- **Appointments** - Manage health sessions and consultations
+- **Messages** - Secure communication with health providers
+- **Profile** - Personal information management
+- **Privacy & Consent** - Control data sharing preferences
 
-## Learn More
+## 🏗️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js 16.1.6 (App Router)
+- React 19.2.3
+- TypeScript 5.x
+- Tailwind CSS 4
+- Lucide React Icons
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📖 Documentation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+For detailed implementation documentation, architecture, and API integration guide, see [IMPLEMENTATION.md](./IMPLEMENTATION.md).
 
-## Deploy on Vercel
+## 🔐 Security & Privacy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Employee-only access (no organization-wide data)
+- Consent-based data sharing
+- HIPAA compliant
+- Encrypted communications
+- Role-based access control
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📂 Project Structure
+
+```
+app/
+  dashboard/          # All dashboard pages
+components/
+  layout/            # Layout components
+  ui/                # Reusable UI components
+lib/
+  api/               # API service layer
+  constants.ts       # App constants
+  utils.ts           # Utility functions
+types/               # TypeScript definitions
+```
+
+## 🛠️ Development
+
+The application currently uses mock data. To integrate with a real backend, update the API calls in `lib/api/index.ts`.
+
+## 📄 License
+
+Proprietary - All rights reserved

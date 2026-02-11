@@ -1,0 +1,189 @@
+// Reset Password Page
+
+'use client';
+
+import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { ArrowLeft, Eye, EyeOff, Lock, CheckCircle } from 'lucide-react';
+import { resetPassword } from '@/lib/api/auth';
+
+export default function ResetPasswordPage() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token') ?? '';
+
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  if (!token) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center">
+        <h2 className="text-2xl font-bold text-gray-900">Invalid link</h2>
+        <p className="mt-2 text-sm text-gray-600">
+          This password reset link is invalid or has expired.
+        </p>
+        <Link
+          href="/auth/forgot-password"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500"
+        >
+          Request a new reset link
+        </Link>
+      </div>
+    );
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await resetPassword({ token, password, confirmPassword });
+      setSuccess(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+          <CheckCircle className="h-6 w-6 text-green-600" />
+        </div>
+        <h2 className="mt-4 text-2xl font-bold text-gray-900">Password reset</h2>
+        <p className="mt-2 text-sm text-gray-600">
+          Your password has been reset successfully. You can now sign in with your new
+          password.
+        </p>
+        <Link
+          href="/auth/login"
+          className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Go to Sign in
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+      <div className="mb-6 text-center">
+        <h2 className="text-2xl font-bold text-gray-900">Reset password</h2>
+        <p className="mt-1 text-sm text-gray-600">Enter your new password below</p>
+      </div>
+
+      {error && (
+        <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* New password */}
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            New password
+          </label>
+          <div className="relative mt-1">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Min. 8 characters"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Confirm password */}
+        <div>
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Confirm password
+          </label>
+          <input
+            id="confirmPassword"
+            type={showPassword ? 'text' : 'password'}
+            required
+            minLength={8}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Re-enter password"
+          />
+        </div>
+
+        {/* Password strength hints */}
+        <div className="rounded-lg bg-gray-50 p-3 text-xs text-gray-600">
+          <p className="font-medium text-gray-700">Password requirements:</p>
+          <ul className="mt-1 list-inside list-disc space-y-0.5">
+            <li className={password.length >= 8 ? 'text-green-600' : ''}>
+              At least 8 characters
+            </li>
+            <li className={/[A-Z]/.test(password) ? 'text-green-600' : ''}>
+              One uppercase letter
+            </li>
+            <li className={/[0-9]/.test(password) ? 'text-green-600' : ''}>
+              One number
+            </li>
+            <li className={/[^A-Za-z0-9]/.test(password) ? 'text-green-600' : ''}>
+              One special character
+            </li>
+          </ul>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+        >
+          {loading ? (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          ) : (
+            <Lock className="h-4 w-4" />
+          )}
+          {loading ? 'Resetting…' : 'Reset password'}
+        </button>
+      </form>
+
+      <div className="mt-4 text-center">
+        <Link
+          href="/auth/login"
+          className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to sign in
+        </Link>
+      </div>
+    </div>
+  );
+}
