@@ -85,9 +85,9 @@ export default function AcceptInvitePage() {
   // Loading state
   if (inviteValid === null) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center">
-        <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-        <p className="mt-3 text-sm text-gray-500">Validating invite…</p>
+      <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm text-center">
+        <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-primary-600 border-t-transparent" />
+        <p className="mt-3 text-sm text-slate-500">Validating invite…</p>
       </div>
     );
   }
@@ -95,9 +95,9 @@ export default function AcceptInvitePage() {
   // Invalid token
   if (!inviteValid) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center">
-        <h2 className="text-2xl font-bold text-gray-900">Invalid invite</h2>
-        <p className="mt-2 text-sm text-gray-600">
+      <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm text-center">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">Invalid invite</h2>
+        <p className="mt-2 text-sm text-slate-600">
           This invitation link is invalid or has expired. Please contact your employer
           for a new invite.
         </p>
@@ -106,16 +106,16 @@ export default function AcceptInvitePage() {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+    <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
       <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold text-gray-900">Welcome to Vitaway</h2>
-        <p className="mt-1 text-sm text-gray-600">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">Welcome to Vitaway</h2>
+        <p className="mt-1 text-sm text-slate-600">
           Complete your account setup to get started
         </p>
       </div>
 
       {/* Org badge */}
-      <div className="mb-6 flex items-center justify-center gap-2 rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700">
+      <div className="mb-6 flex items-center justify-center gap-2 rounded-lg bg-primary-50 px-4 py-3 text-sm text-primary-700">
         <Building className="h-4 w-4" />
         <span>
           You&apos;ve been invited by <strong>{orgName}</strong>
@@ -131,19 +131,19 @@ export default function AcceptInvitePage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Email (read-only) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Email address</label>
+          <label className="block text-sm font-medium text-slate-700">Email address</label>
           <input
             type="email"
             value={inviteEmail}
             disabled
-            className="mt-1 block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-500"
+            className="mt-1 block w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-500"
           />
         </div>
 
         {/* Name fields */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="firstName" className="block text-sm font-medium text-slate-700">
               First name
             </label>
             <input
@@ -152,12 +152,12 @@ export default function AcceptInvitePage() {
               required
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="John"
             />
           </div>
           <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="lastName" className="block text-sm font-medium text-slate-700">
               Last name
             </label>
             <input
@@ -166,7 +166,7 @@ export default function AcceptInvitePage() {
               required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="Doe"
             />
           </div>
@@ -174,7 +174,7 @@ export default function AcceptInvitePage() {
 
         {/* Password */}
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="block text-sm font-medium text-slate-700">
             Create password
           </label>
           <div className="relative mt-1">
@@ -185,13 +185,13 @@ export default function AcceptInvitePage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block w-full rounded-lg border border-slate-300 px-4 py-2.5 pr-10 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="Min. 8 characters"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
               tabIndex={-1}
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -203,7 +203,7 @@ export default function AcceptInvitePage() {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-slate-700"
           >
             Confirm password
           </label>
@@ -214,14 +214,14 @@ export default function AcceptInvitePage() {
             minLength={8}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholder="Re-enter password"
           />
         </div>
 
         {/* Password hints */}
-        <div className="rounded-lg bg-gray-50 p-3 text-xs text-gray-600">
-          <p className="font-medium text-gray-700">Password requirements:</p>
+        <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
+          <p className="font-medium text-slate-700">Password requirements:</p>
           <ul className="mt-1 list-inside list-disc space-y-0.5">
             <li className={password.length >= 8 ? 'text-green-600' : ''}>
               At least 8 characters
@@ -241,7 +241,7 @@ export default function AcceptInvitePage() {
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50">
         >
           {loading ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -252,13 +252,13 @@ export default function AcceptInvitePage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-xs text-gray-500">
+      <p className="mt-6 text-center text-xs text-slate-500">
         By creating an account you agree to Vitaway&apos;s{' '}
-        <a href="#" className="text-blue-600 hover:text-blue-500">
+        <a href="#" className="text-primary-600 hover:text-primary-700">
           Terms of Service
         </a>{' '}
         and{' '}
-        <a href="#" className="text-blue-600 hover:text-blue-500">
+        <a href="#" className="text-primary-600 hover:text-primary-700">
           Privacy Policy
         </a>
         .

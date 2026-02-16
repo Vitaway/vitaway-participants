@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-background: 248 250 252; /* slate-50 */
+  --color-background-secondary: 241 245 249; /* slate-100 */
+  --color-foreground: 30 41 59; /* slate-800 */
+  --color-foreground-secondary: 71 85 105; /* slate-600 */
 }
 
 :root.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --color-background: 30 41 59; /* slate-800 */
+  --color-background-secondary: 51 65 85; /* slate-700 */
+  --color-foreground: 248 250 252; /* slate-50 */
+  --color-foreground-secondary: 203 213 225; /* slate-300 */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  @apply bg-slate-50 text-slate-800 dark:bg-slate-800 dark:text-slate-50;
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Custom scrollbar */
@@ -30,13 +32,13 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-slate-200 dark:bg-slate-900;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 dark:bg-gray-600 rounded;
+  @apply bg-slate-400 dark:bg-slate-600 rounded;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500 dark:bg-gray-500;
+  @apply bg-slate-500;
 }

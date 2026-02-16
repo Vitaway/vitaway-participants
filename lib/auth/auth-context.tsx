@@ -16,23 +16,56 @@ import * as authApi from '@/lib/api/auth';
 
 // ─── Token helpers ──────────────────────────────────────────────────
 function saveTokens(tokens: AuthTokens) {
-  localStorage.setItem('vitaway_access_token', tokens.accessToken);
-  localStorage.setItem('vitaway_refresh_token', tokens.refreshToken);
-  localStorage.setItem('vitaway_expires_at', String(tokens.expiresAt));
+  if (typeof window === 'undefined') return;
+  
+  try {
+    localStorage.setItem('vitaway_access_token', tokens.accessToken);
+    localStorage.setItem('vitaway_refresh_token', tokens.refreshToken);
+    localStorage.setItem('vitaway_expires_at', String(tokens.expiresAt));
+    
+    // Also set cookie for middleware
+    const maxAge = Math.floor((tokens.expiresAt - Date.now()) / 1000);
+    document.cookie = `vitaway_access_token=${tokens.accessToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
+  } catch (error) {
+    console.error('Error saving tokens:', error);
+  }
 }
 
 function clearTokens() {
+  if (typeof window === 'undefined') return;
+  
   localStorage.removeItem('vitaway_access_token');
   localStorage.removeItem('vitaway_refresh_token');
   localStorage.removeItem('vitaway_expires_at');
+  
+  // Also clear cookie
+  document.cookie = 'vitaway_access_token=; path=/; max-age=0';
 }
 
 function getStoredTokens(): AuthTokens | null {
   if (typeof window === 'undefined') return null;
-  const accessToken = localStorage.getItem('vitaway_access_token');
-  const refreshToken = localStorage.getItem('vitaway_refresh_token');
-  const expiresAt = localStorage.getItem('vitaway_expires_at');
-  if (!accessToken || !refreshToken || !expiresAt) return null;
+  
+  let accessToken = localStorage.getItem('vitaway_access_token');
+  let refreshToken = localStorage.getItem('vitaway_refresh_token');
+  let expiresAt = localStorage.getItem('vitaway_expires_at');
+  
+  // Fallback to cookie if localStorage doesn't have it
+  if (!accessToken) {
+    const cookies = document.cookie.split(';');
+    const tokenCookie = cookies.find(c => c.trim().startsWith('vitaway_access_token='));
+    if (tokenCookie) {
+      accessToken = tokenCookie.split('=')[1];
+      // Use same token for refresh (backend uses same token)
+      refreshToken = accessToken;
+      // Set far future expiry
+      expiresAt = String(Date.now() + (365 * 24 * 60 * 60 * 1000));
+    }
+  }
+  
+  if (!accessToken || !refreshToken || !expiresAt) {
+    return null;
+  }
+  
   return { accessToken, refreshToken, expiresAt: Number(expiresAt) };
 }
 
@@ -85,7 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           clearTokens();
           setState({ user: null, tokens: null, isAuthenticated: false, isLoading: false });
         }
-      } catch {
+      } catch (error) {
+        console.error('Auth hydration error:', error);
         clearTokens();
         setState({ user: null, tokens: null, isAuthenticated: false, isLoading: false });
       }
@@ -119,12 +153,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleLogin = useCallback(
     async (email: string, password: string) => {
+      console.log('handleLogin called');
       const { user, tokens } = await authApi.login({ email, password });
+      console.log('Login API response:', { user, tokens });
       saveTokens(tokens);
+      console.log('Tokens saved');
+      
+      // Verify token was saved
+      const savedToken = localStorage.getItem('vitaway_access_token');
+      console.log('Verified saved token:', savedToken ? 'EXISTS' : 'MISSING');
+      
       setState({ user, tokens, isAuthenticated: true, isLoading: false });
-      router.push('/dashboard');
+      console.log('State updated, redirecting to dashboard...');
+      
+      // Small delay to ensure localStorage write completes
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 100);
     },
-    [router]
+    []
   );
 
   const handleLogout = useCallback(async () => {
@@ -133,9 +180,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       clearTokens();
       setState({ user: null, tokens: null, isAuthenticated: false, isLoading: false });
-      router.push('/auth/login');
+      window.location.href = '/auth/login';
     }
-  }, [router]);
+  }, []);
 
   return (
     <AuthContext.Provider

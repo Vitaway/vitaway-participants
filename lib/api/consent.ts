@@ -25,11 +25,12 @@ export interface ConsentHistory {
 
 // ─── Get Consent Settings ───────────────────────────────────────────
 export async function getConsentSettings(): Promise<ConsentSetting[]> {
-  const response = await apiClient.get<{ data: any[] }>(
-    '/api/organization/employee/consent/settings'
-  );
-  
-  return response.data.map((setting: any) => ({
+  try {
+    const response = await apiClient.get<{ data: any[] }>(
+      '/api/org/employee/consent/settings'
+    );
+    
+    return Array.isArray(response.data) ? response.data.map((setting: any) => ({
     id: String(setting.id),
     employeeId: String(setting.employee_id),
     consentType: setting.consent_type,
@@ -37,7 +38,11 @@ export async function getConsentSettings(): Promise<ConsentSetting[]> {
     dataSharingPreferences: setting.data_sharing_preferences,
     grantedAt: setting.granted_at,
     updatedAt: setting.updated_at,
-  }));
+  })) : [];
+  } catch (error: any) {
+    console.error('Failed to fetch consent settings:', error);
+    return [];
+  }
 }
 
 // ─── Update Consent Setting ─────────────────────────────────────────
@@ -47,7 +52,7 @@ export async function updateConsentSetting(data: {
   dataSharingPreferences?: any;
 }): Promise<ConsentSetting> {
   const response = await apiClient.put<any>(
-    '/api/organization/employee/consent/settings',
+    '/api/org/employee/consent/settings',
     {
       consent_type: data.consentType,
       employer_visibility: data.employerVisibility,
@@ -68,11 +73,12 @@ export async function updateConsentSetting(data: {
 
 // ─── Get Consent History ────────────────────────────────────────────
 export async function getConsentHistory(): Promise<ConsentHistory[]> {
-  const response = await apiClient.get<{ data: any[] }>(
-    '/api/organization/employee/consent/history'
-  );
-  
-  return response.data.map((history: any) => ({
+  try {
+    const response = await apiClient.get<{ data: any[] }>(
+      '/api/org/employee/consent/history'
+    );
+    
+    return Array.isArray(response.data) ? response.data.map((history: any) => ({
     id: String(history.id),
     consentId: String(history.consent_id),
     action: history.action,
@@ -81,10 +87,14 @@ export async function getConsentHistory(): Promise<ConsentHistory[]> {
     changedAt: history.changed_at,
     ipAddress: history.ip_address,
     userAgent: history.user_agent,
-  }));
+  })) : [];
+  } catch (error: any) {
+    console.error('Failed to fetch consent history:', error);
+    return [];
+  }
 }
 
 // ─── Revoke Consent ─────────────────────────────────────────────────
 export async function revokeConsent(consentId: string): Promise<void> {
-  await apiClient.post(`/api/organization/employee/consent/${consentId}/revoke`);
+  await apiClient.post(`/api/org/employee/consent/${consentId}/revoke`);
 }

@@ -8,7 +8,7 @@ import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getConversations, getMessages } from '@/lib/api';
+import { getConversations, getConversationMessages } from '@/lib/api';
 import { formatDate, getRelativeTime } from '@/lib/utils';
 import type { Conversation, Message } from '@/types';
 
@@ -25,9 +25,9 @@ export default function MessagesPage() {
     async function loadData() {
       try {
         const conversationsData = await getConversations();
-        setConversations(conversationsData);
-        if (conversationsData.length > 0) {
-          setSelectedConversation(conversationsData[0]);
+        setConversations(conversationsData.data);
+        if (conversationsData.data.length > 0) {
+          setSelectedConversation(conversationsData.data[0]);
         }
       } catch (error) {
         console.error('Failed to load conversations:', error);
@@ -43,8 +43,8 @@ export default function MessagesPage() {
     async function loadMessages() {
       if (selectedConversation) {
         try {
-          const messagesData = await getMessages(selectedConversation.id);
-          setMessages(messagesData);
+          const messagesData = await getConversationMessages(selectedConversation.id);
+          setMessages(messagesData.data);
         } catch (error) {
           console.error('Failed to load messages:', error);
         }
@@ -58,7 +58,7 @@ export default function MessagesPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Loading messages...</p>
+          <p className="text-slate-500">Loading messages...</p>
         </div>
       </DashboardLayout>
     );
@@ -92,8 +92,8 @@ export default function MessagesPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
-            <p className="mt-1 text-gray-600">
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Messages</h1>
+            <p className="mt-1 text-slate-600">
               Communicate securely with your health team
             </p>
           </div>
@@ -110,7 +110,7 @@ export default function MessagesPage() {
           <Card className="lg:col-span-1">
             <div className="space-y-2">
               {conversations.length === 0 ? (
-                <p className="py-8 text-center text-sm text-gray-500">
+                <p className="py-8 text-center text-sm text-slate-500">
                   No conversations yet
                 </p>
               ) : (
@@ -120,17 +120,17 @@ export default function MessagesPage() {
                     onClick={() => setSelectedConversation(conversation)}
                     className={`cursor-pointer rounded-lg p-3 transition-colors ${
                       selectedConversation?.id === conversation.id
-                        ? 'bg-blue-50 border-2 border-blue-200'
-                        : 'hover:bg-gray-50 border-2 border-transparent'
+                        ? 'bg-primary-50 border-2 border-primary-200'
+                        : 'hover:bg-slate-50 border-2 border-transparent'
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white font-medium">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white font-medium">
                         <User className="h-5 w-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <p className="font-medium text-gray-900 truncate">
+                          <p className="font-medium text-slate-800 dark:text-slate-50 truncate">
                             {conversation.participantName}
                           </p>
                           {conversation.unreadCount > 0 && (
@@ -139,16 +139,16 @@ export default function MessagesPage() {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 capitalize">
+                        <p className="text-xs text-slate-500 capitalize">
                           {conversation.participantType.toLowerCase()}
                         </p>
                         {conversation.lastMessage && (
-                          <p className="mt-1 text-sm text-gray-600 truncate">
+                          <p className="mt-1 text-sm text-slate-600 truncate">
                             {conversation.lastMessage}
                           </p>
                         )}
                         {conversation.lastMessageAt && (
-                          <p className="mt-1 text-xs text-gray-400">
+                          <p className="mt-1 text-xs text-slate-400">
                             {getRelativeTime(conversation.lastMessageAt)}
                           </p>
                         )}
@@ -165,8 +165,8 @@ export default function MessagesPage() {
             {!selectedConversation ? (
               <div className="flex h-96 items-center justify-center">
                 <div className="text-center">
-                  <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-2 text-sm text-gray-500">
+                  <MessageSquare className="mx-auto h-12 w-12 text-slate-400" />
+                  <p className="mt-2 text-sm text-slate-500">
                     Select a conversation to start messaging
                   </p>
                 </div>
@@ -174,16 +174,16 @@ export default function MessagesPage() {
             ) : (
               <div className="flex h-[600px] flex-col">
                 {/* Conversation Header */}
-                <div className="border-b border-gray-200 pb-4">
+                <div className="border-b border-slate-200 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white">
                       <User className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-slate-800">
                         {selectedConversation.participantName}
                       </h3>
-                      <p className="text-sm text-gray-500 capitalize">
+                      <p className="text-sm text-slate-500 capitalize">
                         {selectedConversation.participantType.toLowerCase()}
                       </p>
                     </div>
@@ -193,7 +193,7 @@ export default function MessagesPage() {
                 {/* Messages List */}
                 <div className="flex-1 overflow-y-auto py-4 space-y-4">
                   {messages.length === 0 ? (
-                    <p className="text-center text-sm text-gray-500">
+                    <p className="text-center text-sm text-slate-500">
                       No messages yet. Start the conversation!
                     </p>
                   ) : (
@@ -208,8 +208,8 @@ export default function MessagesPage() {
                           <div
                             className={`max-w-[70%] rounded-lg px-4 py-2 ${
                               isEmployee
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-900'
+                                ? 'bg-primary-600 text-white'
+                                : 'bg-slate-100 text-slate-800 dark:text-slate-50'
                             }`}
                           >
                             {!isEmployee && (
@@ -220,7 +220,7 @@ export default function MessagesPage() {
                             <p className="text-sm">{message.content}</p>
                             <p
                               className={`mt-1 text-xs ${
-                                isEmployee ? 'text-blue-100' : 'text-gray-500'
+                                isEmployee ? 'text-primary-100' : 'text-slate-500'
                               }`}
                             >
                               {getRelativeTime(message.sentAt)}
@@ -235,7 +235,7 @@ export default function MessagesPage() {
                 {/* Message Input */}
                 <form
                   onSubmit={handleSendMessage}
-                  className="border-t border-gray-200 pt-4"
+                  className="border-t border-slate-200 pt-4"
                 >
                   <div className="flex items-end gap-2">
                     <div className="flex-1">
@@ -244,7 +244,7 @@ export default function MessagesPage() {
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type your message..."
                         rows={3}
-                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                     <div className="flex flex-col gap-2">
@@ -274,8 +274,8 @@ export default function MessagesPage() {
 
         {/* Privacy Notice */}
         <Card>
-          <div className="rounded-lg bg-blue-50 p-4">
-            <p className="text-sm text-blue-900">
+          <div className="rounded-lg bg-primary-50 p-4">
+            <p className="text-sm text-primary-900">
               <strong>Privacy Notice:</strong> All messages are encrypted and securely
               stored. Your conversations are logged for quality assurance and compliance
               purposes. Do not share sensitive personal information such as passwords or

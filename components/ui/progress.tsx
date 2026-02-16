@@ -28,7 +28,7 @@ export function ProgressBar({
   };
 
   const colors = {
-    blue: 'bg-blue-600',
+    blue: 'bg-primary-600',
     green: 'bg-green-600',
     yellow: 'bg-yellow-500',
     red: 'bg-red-600',
@@ -36,14 +36,14 @@ export function ProgressBar({
 
   return (
     <div className={cn('w-full', className)}>
-      <div className={cn('w-full rounded-full bg-gray-200', heights[size])}>
+      <div className={cn('w-full rounded-full bg-slate-200 dark:bg-slate-700', heights[size])}>
         <div
           className={cn('rounded-full transition-all duration-300', heights[size], colors[color])}
           style={{ width: `${percentage}%` }}
         />
       </div>
       {showLabel && (
-        <p className="mt-1 text-xs text-gray-600">
+        <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
           {value} / {max} ({Math.round(percentage)}%)
         </p>
       )}

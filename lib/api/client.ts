@@ -1,7 +1,7 @@
 // API Client Configuration
 // Handles HTTP requests with authentication and error handling
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000';
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -24,7 +24,21 @@ class ApiClient {
 
   private getAuthToken(): string | null {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem('vitaway_access_token');
+    
+    let token = localStorage.getItem('vitaway_access_token');
+    
+    // Fallback to cookie if localStorage doesn't have it
+    if (!token) {
+      const cookies = document.cookie.split(';');
+      const tokenCookie = cookies.find(c => c.trim().startsWith('vitaway_access_token='));
+      if (tokenCookie) {
+        token = tokenCookie.split('=')[1];
+        // Re-save to localStorage for future requests
+        localStorage.setItem('vitaway_access_token', token);
+      }
+    }
+    
+    return token;
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
@@ -82,6 +96,7 @@ class ApiClient {
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers,
+      credentials: 'include', // Include cookies for Laravel Sanctum/CORS
     });
 
     return this.handleResponse<T>(response);
@@ -101,6 +116,7 @@ class ApiClient {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'POST',
       headers,
+      credentials: 'include', // Include cookies for Laravel Sanctum/CORS
       body: data ? JSON.stringify(data) : undefined,
     });
 
@@ -121,6 +137,7 @@ class ApiClient {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'PUT',
       headers,
+      credentials: 'include', // Include cookies for Laravel Sanctum/CORS
       body: data ? JSON.stringify(data) : undefined,
     });
 
@@ -141,6 +158,7 @@ class ApiClient {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       method: 'DELETE',
       headers,
+      credentials: 'include', // Include cookies for Laravel Sanctum/CORS
     });
 
     return this.handleResponse<T>(response);

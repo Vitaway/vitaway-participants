@@ -10,14 +10,21 @@ import type {
   AcceptInvitePayload,
 } from '@/types/auth';
 
-interface LoginResponse {
+interface LoginResponseData {
   user_id: number;
   employee_id: number;
   role: string;
   organization_id: number;
   permissions: string[];
-  token: string;
+  access_token: string;
+  token_type: string;
   expires_at: string;
+}
+
+interface LoginResponse {
+  data: LoginResponseData;
+  message?: string;
+  success: boolean;
 }
 
 // ─── Login ──────────────────────────────────────────────────────────
@@ -25,31 +32,33 @@ export async function login(
   credentials: LoginCredentials
 ): Promise<{ user: AuthUser; tokens: AuthTokens }> {
   const response = await apiClient.post<LoginResponse>(
-    '/api/organization/employee/auth/login',
+    '/api/org/employee/auth/login',
     credentials
   );
 
+  const { data } = response;
+
   // Store token
   if (typeof window !== 'undefined') {
-    localStorage.setItem('vitaway_access_token', response.token);
-    localStorage.setItem('vitaway_token_expires_at', response.expires_at);
+    localStorage.setItem('vitaway_access_token', data.access_token);
+    localStorage.setItem('vitaway_token_expires_at', data.expires_at);
   }
 
   // Transform backend response to frontend format
   const user: AuthUser = {
-    id: String(response.user_id),
+    id: String(data.user_id),
     email: credentials.email,
     firstName: '', // Will be fetched from profile
     lastName: '',
-    role: response.role as 'EMPLOYEE',
-    organizationId: String(response.organization_id),
+    role: data.role as 'EMPLOYEE',
+    organizationId: String(data.organization_id),
     organizationName: '', // Will be fetched from profile
   };
 
   const tokens: AuthTokens = {
-    accessToken: response.token,
-    refreshToken: response.token, // Backend uses same token
-    expiresAt: new Date(response.expires_at).getTime(),
+    accessToken: data.access_token,
+    refreshToken: data.access_token, // Backend uses same token
+    expiresAt: new Date(data.expires_at).getTime(),
   };
 
   return { user, tokens };
@@ -57,7 +66,7 @@ export async function login(
 
 // ─── Logout ─────────────────────────────────────────────────────────
 export async function logout(): Promise<void> {
-  await apiClient.post('/api/organization/employee/auth/logout');
+  await apiClient.post('/api/org/employee/auth/logout');
   
   // Clear stored tokens
   if (typeof window !== 'undefined') {
@@ -75,7 +84,8 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 
   try {
     // Fetch employee profile to get current user data
-    const profile = await apiClient.get<any>('/api/organization/employee/profile');
+    const response = await apiClient.get<{ data: any; success: boolean }>('/api/org/employee/profile');
+    const profile = response.data;
     
     return {
       id: String(profile.id),
@@ -99,7 +109,7 @@ export async function refreshToken(
   _refreshToken: string
 ): Promise<AuthTokens> {
   const response = await apiClient.post<LoginResponse>(
-    '/api/organization/employee/auth/refresh'
+    '/api/org/employee/auth/refresh'
   );
 
   // Store new token

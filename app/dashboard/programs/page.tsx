@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ProgressBar } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { getPrograms, getProgramModules } from '@/lib/api';
+import { getEnrolledPrograms, getProgramContent } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import type { Program, ProgramModule } from '@/types';
 
@@ -22,10 +22,10 @@ export default function ProgramsPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const programsData = await getPrograms();
-        setPrograms(programsData);
-        if (programsData.length > 0) {
-          setSelectedProgram(programsData[0]);
+        const programsData = await getEnrolledPrograms();
+        setPrograms(programsData.data);
+        if (programsData.data.length > 0) {
+          setSelectedProgram(programsData.data[0]);
         }
       } catch (error) {
         console.error('Failed to load programs:', error);
@@ -56,7 +56,7 @@ export default function ProgramsPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Loading programs...</p>
+          <p className="text-slate-500">Loading programs...</p>
         </div>
       </DashboardLayout>
     );
@@ -90,8 +90,8 @@ export default function ProgramsPage() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Programs & Learning</h1>
-          <p className="mt-1 text-gray-600">
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Programs & Learning</h1>
+          <p className="mt-1 text-slate-600">
             Engage with educational content and track your learning progress
           </p>
         </div>
@@ -100,12 +100,12 @@ export default function ProgramsPage() {
         <div className="grid gap-6 md:grid-cols-3">
           <Card>
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-blue-100 p-3">
-                <BookOpen className="h-6 w-6 text-blue-600" />
+              <div className="rounded-full bg-primary-100 p-3">
+                <BookOpen className="h-6 w-6 text-primary-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Programs</p>
-                <p className="text-2xl font-bold text-gray-900">{programs.length}</p>
+                <p className="text-sm text-slate-600">Total Programs</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{programs.length}</p>
               </div>
             </div>
           </Card>
@@ -116,8 +116,8 @@ export default function ProgramsPage() {
                 <Clock className="h-6 w-6 text-yellow-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">In Progress</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm text-slate-600">In Progress</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
                   {inProgressPrograms.length}
                 </p>
               </div>
@@ -130,8 +130,8 @@ export default function ProgramsPage() {
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Completed</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm text-slate-600">Completed</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
                   {completedPrograms.length}
                 </p>
               </div>
@@ -141,7 +141,7 @@ export default function ProgramsPage() {
 
         {/* Programs Grid */}
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Programs</h2>
+          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-50 mb-4">Your Programs</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {programs.map((program) => {
               const progress = Math.round(
@@ -153,7 +153,7 @@ export default function ProgramsPage() {
                   key={program.id}
                   className={`cursor-pointer transition-all ${
                     selectedProgram?.id === program.id
-                      ? 'ring-2 ring-blue-500'
+                      ? 'ring-2 ring-primary-500'
                       : 'hover:shadow-md'
                   }`}
                   onClick={() => setSelectedProgram(program)}
@@ -161,18 +161,18 @@ export default function ProgramsPage() {
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50">
                           {program.title}
                         </h3>
-                        <p className="mt-1 text-sm text-gray-600">{program.description}</p>
+                        <p className="mt-1 text-sm text-slate-600">{program.description}</p>
                       </div>
                       {getStatusBadge(program.status)}
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Progress</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="text-slate-600">Progress</span>
+                        <span className="font-medium text-slate-800 dark:text-slate-50">
                           {program.completedModules} / {program.totalModules} modules
                         </span>
                       </div>
@@ -182,7 +182,7 @@ export default function ProgramsPage() {
                       />
                     </div>
 
-                    <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
                       <span>Assigned: {formatDate(program.assignedAt)}</span>
                       {program.dueDate && (
                         <span>Due: {formatDate(program.dueDate)}</span>
@@ -200,7 +200,7 @@ export default function ProgramsPage() {
           <Card title={`${selectedProgram.title} - Modules`}>
             <div className="space-y-3">
               {modules.length === 0 ? (
-                <p className="py-8 text-center text-sm text-gray-500">
+                <p className="py-8 text-center text-sm text-slate-500">
                   No modules available
                 </p>
               ) : (
@@ -210,7 +210,7 @@ export default function ProgramsPage() {
                     className={`rounded-lg border p-4 transition-all ${
                       module.completed
                         ? 'border-green-200 bg-green-50'
-                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                        : 'border-slate-200 hover:border-primary-300 hover:bg-primary-50'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-4">
@@ -219,7 +219,7 @@ export default function ProgramsPage() {
                           className={`rounded-full p-2 ${
                             module.completed
                               ? 'bg-green-100 text-green-600'
-                              : 'bg-blue-100 text-blue-600'
+                              : 'bg-primary-100 text-primary-600'
                           }`}
                         >
                           {module.completed ? (
@@ -230,15 +230,15 @@ export default function ProgramsPage() {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h4 className="font-medium text-gray-900">{module.title}</h4>
+                            <h4 className="font-medium text-slate-800 dark:text-slate-50">{module.title}</h4>
                             <Badge variant="default" className="text-xs">
                               {module.type}
                             </Badge>
                           </div>
-                          <p className="mt-1 text-sm text-gray-600">
+                          <p className="mt-1 text-sm text-slate-600">
                             {module.description}
                           </p>
-                          <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
+                          <div className="mt-2 flex items-center gap-4 text-xs text-slate-500">
                             {module.duration && (
                               <span className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />

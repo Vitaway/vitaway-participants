@@ -21,7 +21,7 @@ export default function GoalsPage() {
     async function loadData() {
       try {
         const goalsData = await getGoals();
-        setGoals(goalsData);
+        setGoals(goalsData.data);
       } catch (error) {
         console.error('Failed to load goals:', error);
       } finally {
@@ -36,7 +36,7 @@ export default function GoalsPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Loading goals...</p>
+          <p className="text-slate-500">Loading goals...</p>
         </div>
       </DashboardLayout>
     );
@@ -62,10 +62,10 @@ export default function GoalsPage() {
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      EXERCISE: 'bg-blue-100 text-blue-800',
+      EXERCISE: 'bg-primary-100 text-primary-800',
       NUTRITION: 'bg-green-100 text-green-800',
       MEDICATION: 'bg-purple-100 text-purple-800',
-      OTHER: 'bg-gray-100 text-gray-800',
+      OTHER: 'bg-slate-100 text-slate-800',
     };
     return colors[category] || colors.OTHER;
   };
@@ -86,8 +86,8 @@ export default function GoalsPage() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Goals & Progress</h1>
-          <p className="mt-1 text-gray-600">
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Goals & Progress</h1>
+          <p className="mt-1 text-slate-600">
             Track your health goals and celebrate your achievements
           </p>
         </div>
@@ -96,12 +96,12 @@ export default function GoalsPage() {
         <div className="grid gap-6 md:grid-cols-3">
           <Card>
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-blue-100 p-3">
-                <Target className="h-6 w-6 text-blue-600" />
+              <div className="rounded-full bg-primary-100 p-3">
+                <Target className="h-6 w-6 text-primary-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Active Goals</p>
-                <p className="text-2xl font-bold text-gray-900">{activeGoals.length}</p>
+                <p className="text-sm text-slate-600">Active Goals</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{activeGoals.length}</p>
               </div>
             </div>
           </Card>
@@ -112,8 +112,8 @@ export default function GoalsPage() {
                 <Award className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Completed</p>
-                <p className="text-2xl font-bold text-gray-900">{completedGoals.length}</p>
+                <p className="text-sm text-slate-600">Completed</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{completedGoals.length}</p>
               </div>
             </div>
           </Card>
@@ -124,8 +124,8 @@ export default function GoalsPage() {
                 <TrendingUp className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Overall Progress</p>
-                <p className="text-2xl font-bold text-gray-900">{totalProgress}%</p>
+                <p className="text-sm text-slate-600">Overall Progress</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{totalProgress}%</p>
               </div>
             </div>
           </Card>
@@ -139,8 +139,8 @@ export default function GoalsPage() {
               onClick={() => setFilter(status as typeof filter)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 filter === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
               }`}
             >
               {status}
@@ -152,7 +152,7 @@ export default function GoalsPage() {
         <div className="space-y-4">
           {filteredGoals.length === 0 ? (
             <Card>
-              <p className="py-12 text-center text-gray-500">
+              <p className="py-12 text-center text-slate-500">
                 No {filter.toLowerCase()} goals found
               </p>
             </Card>
@@ -175,7 +175,7 @@ export default function GoalsPage() {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-lg font-semibold text-gray-900">
+                            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50">
                               {goal.title}
                             </h3>
                             <Badge
@@ -185,10 +185,10 @@ export default function GoalsPage() {
                               {goal.status}
                             </Badge>
                           </div>
-                          <p className="mt-1 text-sm text-gray-600">
+                          <p className="mt-1 text-sm text-slate-600">
                             {goal.description}
                           </p>
-                          <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
+                          <div className="mt-2 flex items-center gap-4 text-xs text-slate-500">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               {formatDate(goal.startDate)} - {formatDate(goal.endDate)}
@@ -202,8 +202,8 @@ export default function GoalsPage() {
                     {/* Progress */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Progress</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="text-slate-600">Progress</span>
+                        <span className="font-medium text-slate-800 dark:text-slate-50">
                           {goal.currentValue} / {goal.targetValue} {goal.unit}
                         </span>
                       </div>
@@ -211,16 +211,16 @@ export default function GoalsPage() {
                         value={progress}
                         color={isCompleted ? 'green' : 'blue'}
                       />
-                      <p className="text-xs text-gray-500 text-right">{progress}% complete</p>
+                      <p className="text-xs text-slate-500 text-right">{progress}% complete</p>
                     </div>
 
                     {/* Action Buttons */}
                     {!isCompleted && (
-                      <div className="flex gap-2 pt-2 border-t border-gray-200">
-                        <button className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                      <div className="flex gap-2 pt-2 border-t border-slate-200">
+                        <button className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
                           Update Progress
                         </button>
-                        <button className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
                           View Details
                         </button>
                       </div>
@@ -239,7 +239,7 @@ export default function GoalsPage() {
               <Award className="h-12 w-12" />
               <div>
                 <h3 className="text-lg font-semibold">Keep Going!</h3>
-                <p className="mt-1 text-sm text-blue-100">
+                <p className="mt-1 text-sm text-primary-100">
                   You're making great progress on your health journey. Stay consistent
                   and you'll reach your goals!
                 </p>

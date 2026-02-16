@@ -30,7 +30,7 @@ export default function AppointmentsPage() {
     async function loadData() {
       try {
         const appointmentsData = await getAppointments();
-        setAppointments(appointmentsData);
+        setAppointments(appointmentsData.data);
       } catch (error) {
         console.error('Failed to load appointments:', error);
       } finally {
@@ -45,7 +45,7 @@ export default function AppointmentsPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Loading appointments...</p>
+          <p className="text-slate-500">Loading appointments...</p>
         </div>
       </DashboardLayout>
     );
@@ -93,8 +93,8 @@ export default function AppointmentsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Appointments</h1>
-            <p className="mt-1 text-gray-600">
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Appointments</h1>
+            <p className="mt-1 text-slate-600">
               Manage your health sessions and consultations
             </p>
           </div>
@@ -108,12 +108,12 @@ export default function AppointmentsPage() {
         <div className="grid gap-6 md:grid-cols-3">
           <Card>
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-blue-100 p-3">
-                <Calendar className="h-6 w-6 text-blue-600" />
+              <div className="rounded-full bg-primary-100 p-3">
+                <Calendar className="h-6 w-6 text-primary-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Upcoming</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm text-slate-600">Upcoming</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
                   {upcomingAppointments.length}
                 </p>
               </div>
@@ -126,8 +126,8 @@ export default function AppointmentsPage() {
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Completed</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm text-slate-600">Completed</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
                   {appointments.filter((a) => a.status === 'COMPLETED').length}
                 </p>
               </div>
@@ -136,12 +136,12 @@ export default function AppointmentsPage() {
 
           <Card>
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-gray-100 p-3">
-                <Clock className="h-6 w-6 text-gray-600" />
+              <div className="rounded-full bg-slate-100 p-3">
+                <Clock className="h-6 w-6 text-slate-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Sessions</p>
-                <p className="text-2xl font-bold text-gray-900">{appointments.length}</p>
+                <p className="text-sm text-slate-600">Total Sessions</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{appointments.length}</p>
               </div>
             </div>
           </Card>
@@ -155,8 +155,8 @@ export default function AppointmentsPage() {
               onClick={() => setFilter(status as typeof filter)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 filter === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
               }`}
             >
               {status}
@@ -168,7 +168,7 @@ export default function AppointmentsPage() {
         <div className="space-y-4">
           {filteredAppointments.length === 0 ? (
             <Card>
-              <p className="py-12 text-center text-gray-500">
+              <p className="py-12 text-center text-slate-500">
                 No {filter.toLowerCase()} appointments found
               </p>
             </Card>
@@ -186,12 +186,12 @@ export default function AppointmentsPage() {
                     <div className="space-y-4">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-4">
-                          <div className="rounded-full bg-blue-100 p-3 text-blue-600">
+                          <div className="rounded-full bg-primary-100 p-3 text-primary-600">
                             {getTypeIcon(appointment.type)}
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <h3 className="text-lg font-semibold text-gray-900">
+                              <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50">
                                 {appointment.title}
                               </h3>
                               <Badge variant={getStatusColor(appointment.status)}>
@@ -199,7 +199,7 @@ export default function AppointmentsPage() {
                               </Badge>
                             </div>
                             <div className="mt-2 space-y-1">
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <div className="flex items-center gap-2 text-sm text-slate-600">
                                 <User className="h-4 w-4" />
                                 <span>
                                   {appointment.provider.name}
@@ -207,11 +207,11 @@ export default function AppointmentsPage() {
                                     ` - ${appointment.provider.title}`}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <div className="flex items-center gap-2 text-sm text-slate-600">
                                 <Calendar className="h-4 w-4" />
                                 <span>{formatDate(appointment.scheduledAt)}</span>
                               </div>
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <div className="flex items-center gap-2 text-sm text-slate-600">
                                 <Clock className="h-4 w-4" />
                                 <span>
                                   {formatTime(appointment.scheduledAt)} (
@@ -219,15 +219,15 @@ export default function AppointmentsPage() {
                                 </span>
                               </div>
                               {appointment.teleheathLink && (
-                                <div className="flex items-center gap-2 text-sm text-blue-600">
+                                <div className="flex items-center gap-2 text-sm text-primary-600">
                                   <Video className="h-4 w-4" />
                                   <span>Telehealth session</span>
                                 </div>
                               )}
                             </div>
                             {appointment.notes && (
-                              <div className="mt-3 rounded-lg bg-gray-50 p-3">
-                                <p className="text-sm text-gray-700">
+                              <div className="mt-3 rounded-lg bg-slate-50 p-3">
+                                <p className="text-sm text-slate-700">
                                   <strong>Notes:</strong> {appointment.notes}
                                 </p>
                               </div>
@@ -238,7 +238,7 @@ export default function AppointmentsPage() {
 
                       {/* Action Buttons */}
                       {isUpcoming && appointment.status === 'SCHEDULED' && (
-                        <div className="flex gap-2 pt-2 border-t border-gray-200">
+                        <div className="flex gap-2 pt-2 border-t border-slate-200">
                           {appointment.teleheathLink && (
                             <Button className="flex-1 flex items-center gap-2">
                               <Video className="h-4 w-4" />

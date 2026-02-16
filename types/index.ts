@@ -2,6 +2,7 @@
 
 export type UserRole = 'EMPLOYEE';
 
+// ─── Employee Profile ───────────────────────────────────────────────
 export interface Employee {
   id: string;
   email: string;
@@ -14,141 +15,237 @@ export interface Employee {
   dateOfBirth?: string;
   phone?: string;
   joinedAt: string;
+  enrollmentStatus: 'active' | 'inactive' | 'suspended';
 }
 
-export interface ConsentPreferences {
-  allowEmployerAccess: boolean;
-  allowAggregatedData: boolean;
-  allowIndividualData: boolean;
-  lastUpdated: string;
-  version: string;
+// ─── Consent & Privacy ──────────────────────────────────────────────
+export type ConsentType = 'health_data' | 'vitals' | 'assessments' | 'appointments' | 'goals' | 'programs';
+
+export interface ConsentSetting {
+  id: string;
+  employeeId: string;
+  consentType: ConsentType;
+  employerVisibility: boolean;
+  dataSharingPreferences?: Record<string, any>;
+  grantedAt: string;
+  updatedAt: string;
 }
+
+export interface ConsentHistory {
+  id: string;
+  consentId: string;
+  action: string;
+  previousValue: any;
+  newValue: any;
+  changedAt: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+// ─── Health Data ────────────────────────────────────────────────────
+export type VitalType = 'blood_pressure' | 'weight' | 'bmi' | 'glucose' | 'heart_rate' | 'temperature' | 'oxygen_saturation';
 
 export interface VitalReading {
   id: string;
   employeeId: string;
-  type: 'BMI' | 'WEIGHT' | 'BLOOD_PRESSURE' | 'GLUCOSE';
-  value: number | { systolic: number; diastolic: number };
+  vitalType: VitalType;
+  value: number | string;
   unit: string;
   recordedAt: string;
+  recordedBy?: string;
   notes?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface HealthAssessment {
   id: string;
   employeeId: string;
+  assessmentType: string;
   title: string;
-  type: string;
   score?: number;
-  completedAt: string;
-  results: Record<string, any>;
+  maxScore?: number;
+  status: 'pending' | 'completed' | 'cancelled';
+  completedAt?: string;
+  results?: Record<string, any>;
+  recommendations?: string[];
+  createdAt: string;
 }
+
+// ─── Goals & Progress ───────────────────────────────────────────────
+export type GoalCategory = 'exercise' | 'nutrition' | 'weight_management' | 'stress_management' | 'sleep' | 'other';
+export type GoalStatus = 'active' | 'completed' | 'paused' | 'cancelled';
 
 export interface Goal {
   id: string;
   employeeId: string;
   title: string;
-  description: string;
-  category: 'EXERCISE' | 'NUTRITION' | 'MEDICATION' | 'OTHER';
+  description?: string;
+  category: GoalCategory;
   targetValue: number;
   currentValue: number;
   unit: string;
   startDate: string;
-  endDate: string;
-  status: 'ACTIVE' | 'COMPLETED' | 'PAUSED';
-  assignedBy: string;
+  targetDate: string;
+  status: GoalStatus;
+  assignedBy?: string;
+  assignedByName?: string;
+  progressPercentage: number;
+  createdAt: string;
+  updatedAt: string;
 }
+
+export interface GoalProgress {
+  id: string;
+  goalId: string;
+  progressValue: number;
+  notes?: string;
+  recordedAt: string;
+  recordedBy: string;
+}
+
+// ─── Programs & Learning ────────────────────────────────────────────
+export type ProgramStatus = 'not_started' | 'in_progress' | 'completed' | 'paused';
+export type ContentType = 'video' | 'article' | 'quiz' | 'exercise' | 'document';
 
 export interface Program {
   id: string;
   title: string;
   description: string;
   category: string;
-  totalModules: number;
-  completedModules: number;
-  assignedAt: string;
-  dueDate?: string;
-  status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+  imageUrl?: string;
+  durationMinutes?: number;
+  totalContent: number;
+  createdAt: string;
 }
 
-export interface ProgramModule {
+export interface ProgramEnrollment {
+  id: string;
+  programId: string;
+  employeeId: string;
+  program: Program;
+  status: ProgramStatus;
+  progressPercentage: number;
+  enrolledAt: string;
+  completedAt?: string;
+  dueDate?: string;
+}
+
+export interface ProgramContent {
   id: string;
   programId: string;
   title: string;
-  description: string;
-  type: 'VIDEO' | 'ARTICLE' | 'TASK' | 'QUIZ';
+  description?: string;
+  contentType: ContentType;
   contentUrl?: string;
-  duration?: number;
-  completed: boolean;
+  durationMinutes?: number;
+  orderIndex: number;
+  completed?: boolean;
   completedAt?: string;
-  order: number;
 }
+
+// ─── Appointments ───────────────────────────────────────────────────
+export type AppointmentType = 'coaching' | 'mental_health' | 'nutrition' | 'general';
+export type AppointmentStatus = 'scheduled' | 'confirmed' | 'rescheduled' | 'cancelled' | 'completed' | 'no_show';
 
 export interface Appointment {
   id: string;
   employeeId: string;
-  title: string;
-  type: 'HEALTH_COACH' | 'NUTRITIONIST' | 'DOCTOR' | 'SUPPORT';
-  scheduledAt: string;
-  duration: number;
-  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'RESCHEDULED';
-  provider: {
+  providerId: string;
+  appointmentType: AppointmentType;
+  appointmentDate: string;
+  appointmentTime: string;
+  durationMinutes: number;
+  status: AppointmentStatus;
+  notes?: string;
+  telehealthLink?: string;
+  cancellationReason?: string;
+  provider?: {
     id: string;
     name: string;
-    title: string;
-    avatar?: string;
+    email: string;
+    specialty?: string;
   };
-  teleheathLink?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AppointmentBooking {
+  providerId: string;
+  appointmentType: AppointmentType;
+  appointmentDate: string;
+  appointmentTime: string;
+  durationMinutes: number;
   notes?: string;
-  canReschedule: boolean;
-  canCancel: boolean;
+}
+
+// ─── Communication ──────────────────────────────────────────────────
+export type ParticipantType = 'coach' | 'clinician' | 'support';
+
+export interface Conversation {
+  id: string;
+  employeeId: string;
+  participantId: string;
+  participantType: ParticipantType;
+  participantName?: string;
+  lastMessageAt?: string;
+  unreadCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Message {
   id: string;
   conversationId: string;
   senderId: string;
-  senderName: string;
-  senderType: 'EMPLOYEE' | 'COACH' | 'NUTRITIONIST' | 'SUPPORT';
-  content: string;
+  senderType: string;
+  senderName?: string;
+  message: string;
+  isRead: boolean;
   sentAt: string;
-  read: boolean;
-  attachments?: Array<{
-    id: string;
-    name: string;
-    url: string;
-    type: string;
-  }>;
+  readAt?: string;
 }
 
-export interface Conversation {
-  id: string;
-  employeeId: string;
-  participantId: string;
-  participantName: string;
-  participantType: 'COACH' | 'NUTRITIONIST' | 'SUPPORT';
-  participantAvatar?: string;
-  lastMessage?: string;
-  lastMessageAt?: string;
-  unreadCount: number;
-}
+// ─── Notifications ──────────────────────────────────────────────────
+export type NotificationType = 'appointment' | 'goal' | 'program' | 'message' | 'system';
+export type NotificationPriority = 'low' | 'normal' | 'high';
 
 export interface Notification {
   id: string;
   employeeId: string;
-  type: 'APPOINTMENT' | 'PROGRAM' | 'MESSAGE' | 'GOAL' | 'CONSENT' | 'SYSTEM';
+  type: NotificationType;
+  priority: NotificationPriority;
   title: string;
   message: string;
   actionUrl?: string;
-  read: boolean;
+  isRead: boolean;
   createdAt: string;
+  readAt?: string;
 }
 
-export interface DashboardStats {
-  upcomingAppointments: number;
-  activeGoals: number;
-  programProgress: number;
-  unreadMessages: number;
-  currentStreak: number;
-  completedModulesThisWeek: number;
+// ─── Dashboard Overview ─────────────────────────────────────────────
+export interface DashboardOverview {
+  activePrograms: {
+    total: number;
+    inProgress: number;
+    completed: number;
+    programs: ProgramEnrollment[];
+  };
+  latestVitals: {
+    vitalType: VitalType;
+    value: string | number;
+    unit: string;
+    recordedAt: string;
+  }[];
+  upcomingAppointments: Appointment[];
+  unreadNotifications: number;
+  pendingGoals: {
+    total: number;
+    active: number;
+    goals: Goal[];
+  };
+  stats: {
+    totalGoalsCompleted: number;
+    currentStreak: number;
+    programCompletionRate: number;
+  };
 }

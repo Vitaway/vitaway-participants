@@ -19,7 +19,7 @@ export default function HealthOverview() {
     async function loadData() {
       try {
         const vitalsData = await getVitals();
-        setVitals(vitalsData);
+        setVitals(vitalsData.data);
       } catch (error) {
         console.error('Failed to load health data:', error);
       } finally {
@@ -34,7 +34,7 @@ export default function HealthOverview() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Loading health data...</p>
+          <p className="text-slate-500">Loading health data...</p>
         </div>
       </DashboardLayout>
     );
@@ -58,7 +58,7 @@ export default function HealthOverview() {
   const getTrendIcon = (current: number, previous: number) => {
     if (current > previous) return <TrendingUp className="h-4 w-4 text-red-500" />;
     if (current < previous) return <TrendingDown className="h-4 w-4 text-green-500" />;
-    return <Minus className="h-4 w-4 text-gray-400" />;
+    return <Minus className="h-4 w-4 text-slate-400" />;
   };
 
   const formatVitalValue = (vital: VitalReading) => {
@@ -73,8 +73,8 @@ export default function HealthOverview() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Health Overview</h1>
-          <p className="mt-1 text-gray-600">
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Health Overview</h1>
+          <p className="mt-1 text-slate-600">
             View your vital signs and health trends over time
           </p>
         </div>
@@ -102,23 +102,23 @@ export default function HealthOverview() {
               <Card key={type}>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-600">
+                    <p className="text-sm font-medium text-slate-600">
                       {type.replace(/_/g, ' ')}
                     </p>
-                    <Activity className="h-5 w-5 text-gray-400" />
+                    <Activity className="h-5 w-5 text-slate-400" />
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-3xl font-bold text-gray-900">
+                      <p className="text-3xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
                         {typeof latest.value === 'object' && 'systolic' in latest.value
                           ? `${latest.value.systolic}/${latest.value.diastolic}`
                           : latest.value}
                       </p>
                       {previousValue !== undefined && getTrendIcon(currentValue, previousValue)}
                     </div>
-                    <p className="text-xs text-gray-500">{latest.unit}</p>
+                    <p className="text-xs text-slate-500">{latest.unit}</p>
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-slate-500">
                     Last recorded: {formatDate(latest.recordedAt)}
                   </p>
                 </div>
@@ -135,17 +135,17 @@ export default function HealthOverview() {
                 {readings.map((reading) => (
                   <div
                     key={reading.id}
-                    className="flex items-center justify-between rounded-lg border border-gray-200 p-4"
+                    className="flex items-center justify-between rounded-lg border border-slate-200 p-4"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                        <Activity className="h-5 w-5 text-blue-600" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100">
+                        <Activity className="h-5 w-5 text-primary-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-slate-800 dark:text-slate-50">
                           {formatVitalValue(reading)}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-slate-500">
                           {formatDate(reading.recordedAt)}
                         </p>
                       </div>
@@ -160,8 +160,8 @@ export default function HealthOverview() {
 
         {/* Health Note */}
         <Card>
-          <div className="rounded-lg bg-blue-50 p-4">
-            <p className="text-sm text-blue-900">
+          <div className="rounded-lg bg-primary-50 p-4">
+            <p className="text-sm text-primary-900">
               <strong>Note:</strong> This data is for tracking purposes only and does not
               constitute medical advice. Please consult with your healthcare provider for
               medical interpretation and recommendations.
