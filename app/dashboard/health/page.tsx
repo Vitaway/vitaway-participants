@@ -109,7 +109,7 @@ export default function HealthOverview() {
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-3xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                      <p className="text-3xl font-bold text-slate-800 dark:text-slate-50">
                         {typeof latest.value === 'object' && 'systolic' in latest.value
                           ? `${latest.value.systolic}/${latest.value.diastolic}`
                           : latest.value}

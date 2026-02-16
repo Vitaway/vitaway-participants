@@ -41,7 +41,7 @@ export default function LoginPage() {
   return (
     <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 shadow-sm">
       <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">Sign in</h2>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50">Sign in</h2>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Access your personal health dashboard
         </p>

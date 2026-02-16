@@ -103,7 +103,7 @@ export default function DashboardHome() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Upcoming</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {dashboard.upcomingAppointments.length}
                 </p>
                 <p className="text-xs text-slate-500">Appointments</p>
@@ -118,7 +118,7 @@ export default function DashboardHome() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Active</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {dashboard.pendingGoals.active}
                 </p>
                 <p className="text-xs text-slate-500">Goals</p>
@@ -133,7 +133,7 @@ export default function DashboardHome() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Program</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {Math.round(dashboard.stats.programCompletionRate)}%
                 </p>
                 <p className="text-xs text-slate-500">Complete</p>
@@ -148,7 +148,7 @@ export default function DashboardHome() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Streak</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {dashboard.stats.currentStreak}
                 </p>
                 <p className="text-xs text-slate-500">Days</p>
@@ -167,7 +167,7 @@ export default function DashboardHome() {
                   <p className="text-sm text-slate-600">Weight</p>
                   <Activity className="h-4 w-4 text-slate-400" />
                 </div>
-                <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {latestWeight ? `${latestWeight.value} ${latestWeight.unit}` : 'N/A'}
                 </p>
                 {latestWeight && (
@@ -182,7 +182,7 @@ export default function DashboardHome() {
                   <p className="text-sm text-slate-600">BMI</p>
                   <Activity className="h-4 w-4 text-slate-400" />
                 </div>
-                <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {latestBMI ? `${latestBMI.value}` : 'N/A'}
                 </p>
                 {latestBMI && (
@@ -197,7 +197,7 @@ export default function DashboardHome() {
                   <p className="text-sm text-slate-600">Blood Pressure</p>
                   <Activity className="h-4 w-4 text-slate-400" />
                 </div>
-                <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {latestBP && typeof latestBP.value === 'object'
                     ? `${latestBP.value.systolic}/${latestBP.value.diastolic}`
                     : 'N/A'}

@@ -96,7 +96,7 @@ export default function AcceptInvitePage() {
   if (!inviteValid) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm text-center">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">Invalid invite</h2>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50">Invalid invite</h2>
         <p className="mt-2 text-sm text-slate-600">
           This invitation link is invalid or has expired. Please contact your employer
           for a new invite.
@@ -108,7 +108,7 @@ export default function AcceptInvitePage() {
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
       <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">Welcome to Vitaway</h2>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50">Welcome to Vitaway</h2>
         <p className="mt-1 text-sm text-slate-600">
           Complete your account setup to get started
         </p>

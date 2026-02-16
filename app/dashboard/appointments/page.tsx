@@ -113,7 +113,7 @@ export default function AppointmentsPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Upcoming</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {upcomingAppointments.length}
                 </p>
               </div>
@@ -127,7 +127,7 @@ export default function AppointmentsPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Completed</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {appointments.filter((a) => a.status === 'COMPLETED').length}
                 </p>
               </div>
@@ -141,7 +141,7 @@ export default function AppointmentsPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Total Sessions</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{appointments.length}</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">{appointments.length}</p>
               </div>
             </div>
           </Card>

@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
   if (!token) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm text-center">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">Invalid link</h2>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50">Invalid link</h2>
         <p className="mt-2 text-sm text-slate-600">
           This password reset link is invalid or has expired.
         </p>
@@ -66,7 +66,7 @@ export default function ResetPasswordPage() {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
           <CheckCircle className="h-6 w-6 text-green-600" />
         </div>
-        <h2 className="mt-4 text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">Password reset</h2>
+        <h2 className="mt-4 text-2xl font-bold text-slate-800 dark:text-slate-50">Password reset</h2>
         <p className="mt-2 text-sm text-slate-600">
           Your password has been reset successfully. You can now sign in with your new
           password.
@@ -84,7 +84,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
       <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">Reset password</h2>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-50">Reset password</h2>
         <p className="mt-1 text-sm text-slate-600">Enter your new password below</p>
       </div>
 

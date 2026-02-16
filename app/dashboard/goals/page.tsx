@@ -101,7 +101,7 @@ export default function GoalsPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Active Goals</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{activeGoals.length}</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">{activeGoals.length}</p>
               </div>
             </div>
           </Card>
@@ -113,7 +113,7 @@ export default function GoalsPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Completed</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{completedGoals.length}</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">{completedGoals.length}</p>
               </div>
             </div>
           </Card>
@@ -125,7 +125,7 @@ export default function GoalsPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Overall Progress</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{totalProgress}%</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">{totalProgress}%</p>
               </div>
             </div>
           </Card>

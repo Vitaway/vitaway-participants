@@ -105,7 +105,7 @@ export default function ProgramsPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Total Programs</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">{programs.length}</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">{programs.length}</p>
               </div>
             </div>
           </Card>
@@ -117,7 +117,7 @@ export default function ProgramsPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">In Progress</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {inProgressPrograms.length}
                 </p>
               </div>
@@ -131,7 +131,7 @@ export default function ProgramsPage() {
               </div>
               <div>
                 <p className="text-sm text-slate-600">Completed</p>
-                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50 dark:text-slate-50">
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {completedPrograms.length}
                 </p>
               </div>
