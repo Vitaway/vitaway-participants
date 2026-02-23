@@ -28,9 +28,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         setMounted(true);
         const savedTheme = localStorage.getItem('vitaway_theme') as Theme | null;
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+        // Always default to 'light' if not set
+        const initialTheme = savedTheme || 'light';
         setThemeState(initialTheme);
         applyTheme(initialTheme);
     }, []);

@@ -1,14 +1,12 @@
-// Auth Layout — shared chrome for login / forgot-password / invite pages
-
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-gray-800 px-4 py-12">
       {/* Brand */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-primary-600 dark:text-primary-400">Vitaway</h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Employee Health Portal</p>
+      <div className="text-center">
+        <Image src="https://ehr.vitaway.org/logo.png" alt="Vitaway Logo" width={120} height={40} />
       </div>
 
       {/* Page content */}
@@ -16,7 +14,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
       {/* Footer */}
       <p className="mt-8 text-center text-xs text-slate-400 dark:text-slate-500">
-        &copy; {new Date().getFullYear()} Vitaway. All rights reserved.
+        &copy; 2026 Vitaway. All rights reserved.
       </p>
     </div>
   );
