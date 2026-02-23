@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 // Goals & Progress Page
 
 'use client';
@@ -42,13 +43,21 @@ export default function GoalsPage() {
     );
   }
 
+  // Map filter to GoalStatus (lowercase)
+  const filterToStatus = (f: 'ACTIVE' | 'COMPLETED') => {
+    if (f === 'ACTIVE') return 'active';
+    if (f === 'COMPLETED') return 'completed';
+    return undefined;
+  };
+
   const filteredGoals = goals.filter((goal) => {
     if (filter === 'ALL') return true;
-    return goal.status === filter;
+    return goal.status === filterToStatus(filter as 'ACTIVE' | 'COMPLETED');
   });
 
-  const activeGoals = goals.filter((g) => g.status === 'ACTIVE');
-  const completedGoals = goals.filter((g) => g.status === 'COMPLETED');
+  const activeGoals = goals.filter((g) => g.status === 'active');
+  const completedGoals = goals.filter((g) => g.status === 'completed');
+  
   const totalProgress =
     activeGoals.length > 0
       ? Math.round(
@@ -159,7 +168,7 @@ export default function GoalsPage() {
           ) : (
             filteredGoals.map((goal) => {
               const progress = getProgressPercentage(goal.currentValue, goal.targetValue);
-              const isCompleted = goal.status === 'COMPLETED';
+              const isCompleted = goal.status === 'completed';
 
               return (
                 <Card key={goal.id}>
@@ -191,7 +200,7 @@ export default function GoalsPage() {
                           <div className="mt-2 flex items-center gap-4 text-xs text-slate-500">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              {formatDate(goal.startDate)} - {formatDate(goal.endDate)}
+                              {formatDate(goal.startDate)}
                             </span>
                             <span>Assigned by: {goal.assignedBy}</span>
                           </div>
@@ -234,7 +243,7 @@ export default function GoalsPage() {
 
         {/* Motivation Card */}
         <Card>
-          <div className="rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
+          <div className="rounded-lg bg-linear-to-r from-blue-500 to-purple-600 p-6 text-white">
             <div className="flex items-center gap-4">
               <Award className="h-12 w-12" />
               <div>

@@ -11,12 +11,12 @@ import { ProgressBar } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { getEnrolledPrograms, getProgramContent } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
-import type { Program, ProgramModule } from '@/types';
+import type { ProgramEnrollment, ProgramContent } from '@/types';
 
 export default function ProgramsPage() {
-  const [programs, setPrograms] = useState<Program[]>([]);
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
-  const [modules, setModules] = useState<ProgramModule[]>([]);
+  const [programs, setPrograms] = useState<ProgramEnrollment[]>([]);
+  const [selectedProgram, setSelectedProgram] = useState<ProgramEnrollment | null>(null);
+  const [modules, setModules] = useState<ProgramContent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function ProgramsPage() {
     async function loadModules() {
       if (selectedProgram) {
         try {
-          const modulesData = await getProgramModules(selectedProgram.id);
+          const modulesData = await getProgramContent(selectedProgram.id);
           setModules(modulesData);
         } catch (error) {
           console.error('Failed to load modules:', error);
@@ -82,8 +82,8 @@ export default function ProgramsPage() {
     return <Badge variant={variants[status] || 'default'}>{status.replace(/_/g, ' ')}</Badge>;
   };
 
-  const inProgressPrograms = programs.filter((p) => p.status === 'IN_PROGRESS');
-  const completedPrograms = programs.filter((p) => p.status === 'COMPLETED');
+  const inProgressPrograms = programs.filter((p) => p.status === 'in_progress');
+  const completedPrograms = programs.filter((p) => p.status === 'completed');
 
   return (
     <DashboardLayout>
@@ -143,22 +143,22 @@ export default function ProgramsPage() {
         <div>
           <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-50 mb-4">Your Programs</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {programs.map((program) => {
-              const progress = Math.round(
-                (program.completedModules / program.totalModules) * 100
-              );
-
+            {programs.map((enrollment) => {
+              const { program, status, progressPercentage, enrolledAt, dueDate } = enrollment;
+              const progress = Math.round(progressPercentage);
               return (
                 <Card
-                  key={program.id}
-                  className={`cursor-pointer transition-all ${
-                    selectedProgram?.id === program.id
+                  key={enrollment.id}
+                  className={`transition-all ${
+                    selectedProgram?.id === enrollment.id
                       ? 'ring-2 ring-primary-500'
                       : 'hover:shadow-md'
                   }`}
-                  onClick={() => setSelectedProgram(program)}
                 >
-                  <div className="space-y-4">
+                  <div
+                    className="cursor-pointer space-y-4"
+                    onClick={() => setSelectedProgram(enrollment)}
+                  >
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50">
@@ -166,26 +166,26 @@ export default function ProgramsPage() {
                         </h3>
                         <p className="mt-1 text-sm text-slate-600">{program.description}</p>
                       </div>
-                      {getStatusBadge(program.status)}
+                      {getStatusBadge(status)}
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-slate-600">Progress</span>
                         <span className="font-medium text-slate-800 dark:text-slate-50">
-                          {program.completedModules} / {program.totalModules} modules
+                          {progress}%
                         </span>
                       </div>
                       <ProgressBar
                         value={progress}
-                        color={program.status === 'COMPLETED' ? 'green' : 'blue'}
+                        color={status === 'completed' ? 'green' : 'blue'}
                       />
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span>Assigned: {formatDate(program.assignedAt)}</span>
-                      {program.dueDate && (
-                        <span>Due: {formatDate(program.dueDate)}</span>
+                      <span>Assigned: {formatDate(enrolledAt)}</span>
+                      {dueDate && (
+                        <span>Due: {formatDate(dueDate)}</span>
                       )}
                     </div>
                   </div>
@@ -197,7 +197,7 @@ export default function ProgramsPage() {
 
         {/* Selected Program Modules */}
         {selectedProgram && (
-          <Card title={`${selectedProgram.title} - Modules`}>
+          <Card title={`${selectedProgram.program.title} - Modules`}>
             <div className="space-y-3">
               {modules.length === 0 ? (
                 <p className="py-8 text-center text-sm text-slate-500">
@@ -225,24 +225,24 @@ export default function ProgramsPage() {
                           {module.completed ? (
                             <CheckCircle className="h-5 w-5" />
                           ) : (
-                            getModuleIcon(module.type)
+                            getModuleIcon(module.contentType)
                           )}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <h4 className="font-medium text-slate-800 dark:text-slate-50">{module.title}</h4>
                             <Badge variant="default" className="text-xs">
-                              {module.type}
+                              {module.contentType}
                             </Badge>
                           </div>
                           <p className="mt-1 text-sm text-slate-600">
                             {module.description}
                           </p>
                           <div className="mt-2 flex items-center gap-4 text-xs text-slate-500">
-                            {module.duration && (
+                            {module.durationMinutes && (
                               <span className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
-                                {module.duration} min
+                                {module.durationMinutes} min
                               </span>
                             )}
                             {module.completed && module.completedAt && (

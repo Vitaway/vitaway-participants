@@ -2,12 +2,12 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Eye, EyeOff, UserPlus, Building } from 'lucide-react';
 import { acceptInvite, validateInviteToken } from '@/lib/api/auth';
 
-export default function AcceptInvitePage() {
+function AcceptInvitePageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token') ?? '';
@@ -264,5 +264,14 @@ export default function AcceptInvitePage() {
         .
       </p>
     </div>
+  );
+}
+
+// Export Suspense-wrapped page for Next.js
+export default function AcceptInvitePage() {
+  return (
+    <Suspense>
+      <AcceptInvitePageInner />
+    </Suspense>
   );
 }

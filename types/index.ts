@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Employee Dashboard Type Definitions
 
 export type UserRole = 'EMPLOYEE';

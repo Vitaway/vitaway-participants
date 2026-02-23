@@ -1,5 +1,3 @@
-// Health Overview Page - Vitals and Assessments
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -41,10 +39,10 @@ export default function HealthOverview() {
   }
 
   const groupedVitals = vitals.reduce((acc, vital) => {
-    if (!acc[vital.type]) {
-      acc[vital.type] = [];
+    if (!acc[vital.vitalType]) {
+      acc[vital.vitalType] = [];
     }
-    acc[vital.type].push(vital);
+    acc[vital.vitalType].push(vital);
     return acc;
   }, {} as Record<string, VitalReading[]>);
 
@@ -61,8 +59,18 @@ export default function HealthOverview() {
     return <Minus className="h-4 w-4 text-slate-400" />;
   };
 
+  // Type guard for blood pressure value
+  function isBloodPressureValue(value: unknown): value is { systolic: number; diastolic: number } {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      'systolic' in value &&
+      'diastolic' in value
+    );
+  }
+
   const formatVitalValue = (vital: VitalReading) => {
-    if (typeof vital.value === 'object' && 'systolic' in vital.value) {
+    if (vital.vitalType === 'blood_pressure' && isBloodPressureValue(vital.value)) {
       return `${vital.value.systolic}/${vital.value.diastolic} ${vital.unit}`;
     }
     return `${vital.value} ${vital.unit}`;
@@ -84,15 +92,21 @@ export default function HealthOverview() {
           {Object.entries(groupedVitals).map(([type, readings]) => {
             const latest = readings[0];
             const previous = readings[1];
-            
+
             let currentValue: number;
             let previousValue: number | undefined;
 
-            if (typeof latest.value === 'object' && 'systolic' in latest.value) {
+            if (
+              latest.vitalType === 'blood_pressure' &&
+              isBloodPressureValue(latest.value)
+            ) {
               currentValue = latest.value.systolic;
-              previousValue = previous && typeof previous.value === 'object' && 'systolic' in previous.value 
-                ? previous.value.systolic 
-                : undefined;
+              previousValue =
+                previous &&
+                  previous.vitalType === 'blood_pressure' &&
+                  isBloodPressureValue(previous.value)
+                  ? previous.value.systolic
+                  : undefined;
             } else {
               currentValue = latest.value as number;
               previousValue = previous ? (previous.value as number) : undefined;
@@ -110,7 +124,7 @@ export default function HealthOverview() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <p className="text-3xl font-bold text-slate-800 dark:text-slate-50">
-                        {typeof latest.value === 'object' && 'systolic' in latest.value
+                        {latest.vitalType === 'blood_pressure' && isBloodPressureValue(latest.value)
                           ? `${latest.value.systolic}/${latest.value.diastolic}`
                           : latest.value}
                       </p>

@@ -129,14 +129,14 @@ export async function refreshToken(
 
   // Store new token
   if (typeof window !== 'undefined') {
-    localStorage.setItem('vitaway_access_token', response.token);
-    localStorage.setItem('vitaway_token_expires_at', response.expires_at);
+    localStorage.setItem('vitaway_access_token', response.data.access_token);
+    localStorage.setItem('vitaway_token_expires_at', response.data.expires_at);
   }
 
   return {
-    accessToken: response.token,
-    refreshToken: response.token,
-    expiresAt: new Date(response.expires_at).getTime(),
+    accessToken: response.data.access_token,
+    refreshToken: response.data.access_token,
+    expiresAt: new Date(response.data.expires_at).getTime(),
   };
 }
 
@@ -201,24 +201,24 @@ export async function acceptInvite(
 
   // Store token
   if (typeof window !== 'undefined') {
-    localStorage.setItem('vitaway_access_token', response.token);
-    localStorage.setItem('vitaway_token_expires_at', response.expires_at);
+    localStorage.setItem('vitaway_access_token', response.data.access_token);
+    localStorage.setItem('vitaway_token_expires_at', response.data.expires_at);
   }
 
   const user: AuthUser = {
-    id: String(response.user_id),
+    id: String(response.data.user_id),
     email: '', // Will be set from profile
     firstName: payload.firstName,
     lastName: payload.lastName,
-    role: response.role as 'EMPLOYEE',
-    organizationId: String(response.organization_id),
+    role: response.data.role as 'EMPLOYEE',
+    organizationId: String(response.data.organization_id),
     organizationName: '',
   };
 
   const tokens: AuthTokens = {
-    accessToken: response.token,
-    refreshToken: response.token,
-    expiresAt: new Date(response.expires_at).getTime(),
+    accessToken: response.data.access_token,
+    refreshToken: response.data.access_token,
+    expiresAt: new Date(response.data.expires_at).getTime(),
   };
 
   return { user, tokens };

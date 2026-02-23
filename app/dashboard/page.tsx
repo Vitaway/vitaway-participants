@@ -1,4 +1,3 @@
-// Dashboard Home - Overview Page
 
 'use client';
 
@@ -21,9 +20,19 @@ import { Badge } from '@/components/ui/badge';
 import {
   getDashboardOverview,
 } from '@/lib/api';
-import { formatDate, formatDateTime, getProgressPercentage } from '@/lib/utils';
+import { formatDate, getProgressPercentage } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
 import type { DashboardOverview } from '@/types';
+
+
+function isBloodPressureValue(value: unknown): value is { systolic: number; diastolic: number } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'systolic' in value &&
+    'diastolic' in value
+  );
+}
 
 export default function DashboardHome() {
   const [dashboard, setDashboard] = useState<DashboardOverview | null>(null);
@@ -198,7 +207,7 @@ export default function DashboardHome() {
                   <Activity className="h-4 w-4 text-slate-400" />
                 </div>
                 <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50">
-                  {latestBP && typeof latestBP.value === 'object'
+                  {latestBP && isBloodPressureValue(latestBP.value)
                     ? `${latestBP.value.systolic}/${latestBP.value.diastolic}`
                     : 'N/A'}
                 </p>
@@ -236,7 +245,7 @@ export default function DashboardHome() {
                       <div className="flex-1">
                         <p className="font-medium text-slate-800 dark:text-slate-50">{appointment.appointmentType}</p>
                         <p className="mt-1 text-sm text-slate-600">
-                          {appointment.provider?.name || 'Provider TBD'}
+                          {appointment.providerDetails?.name || 'Provider TBD'}
                         </p>
                         <p className="mt-1 text-xs text-slate-500">
                           {formatDate(appointment.appointmentDate)} at {appointment.appointmentTime}
@@ -312,7 +321,7 @@ export default function DashboardHome() {
                         You have {dashboard.unreadNotifications} unread notification{dashboard.unreadNotifications !== 1 ? 's' : ''}
                       </p>
                       <Link href="/dashboard/notifications">
-                        <Button variant="link" className="mt-1 p-0 text-sm">
+                        <Button variant="ghost" className="mt-1 p-0 text-sm">
                           View all notifications
                         </Button>
                       </Link>

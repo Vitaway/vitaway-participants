@@ -1,5 +1,3 @@
-// Messages / Communication Page
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getConversations, getConversationMessages } from '@/lib/api';
-import { formatDate, getRelativeTime } from '@/lib/utils';
+import { getRelativeTime } from '@/lib/utils';
 import type { Conversation, Message } from '@/types';
 
 export default function MessagesPage() {
@@ -75,9 +73,9 @@ export default function MessagesPage() {
       senderId: 'emp-001',
       senderName: 'You',
       senderType: 'EMPLOYEE',
-      content: newMessage,
+      message: newMessage,
       sentAt: new Date().toISOString(),
-      read: true,
+      isRead: true,
     };
 
     setMessages([...messages, message]);
@@ -118,11 +116,10 @@ export default function MessagesPage() {
                   <div
                     key={conversation.id}
                     onClick={() => setSelectedConversation(conversation)}
-                    className={`cursor-pointer rounded-lg p-3 transition-colors ${
-                      selectedConversation?.id === conversation.id
+                    className={`cursor-pointer rounded-lg p-3 transition-colors ${selectedConversation?.id === conversation.id
                         ? 'bg-primary-50 border-2 border-primary-200'
                         : 'hover:bg-slate-50 border-2 border-transparent'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white font-medium">
@@ -142,11 +139,7 @@ export default function MessagesPage() {
                         <p className="text-xs text-slate-500 capitalize">
                           {conversation.participantType.toLowerCase()}
                         </p>
-                        {conversation.lastMessage && (
-                          <p className="mt-1 text-sm text-slate-600 truncate">
-                            {conversation.lastMessage}
-                          </p>
-                        )}
+                        {/* Removed conversation.lastMessage, as it does not exist on Conversation */}
                         {conversation.lastMessageAt && (
                           <p className="mt-1 text-xs text-slate-400">
                             {getRelativeTime(conversation.lastMessageAt)}
@@ -172,7 +165,7 @@ export default function MessagesPage() {
                 </div>
               </div>
             ) : (
-              <div className="flex h-[600px] flex-col">
+              <div className="flex h-150 flex-col">
                 {/* Conversation Header */}
                 <div className="border-b border-slate-200 pb-4">
                   <div className="flex items-center gap-3">
@@ -206,22 +199,20 @@ export default function MessagesPage() {
                           className={`flex ${isEmployee ? 'justify-end' : 'justify-start'}`}
                         >
                           <div
-                            className={`max-w-[70%] rounded-lg px-4 py-2 ${
-                              isEmployee
+                            className={`max-w-[70%] rounded-lg px-4 py-2 ${isEmployee
                                 ? 'bg-primary-600 text-white'
                                 : 'bg-slate-100 text-slate-800 dark:text-slate-50'
-                            }`}
+                              }`}
                           >
                             {!isEmployee && (
                               <p className="text-xs font-medium mb-1 opacity-75">
                                 {message.senderName}
                               </p>
                             )}
-                            <p className="text-sm">{message.content}</p>
+                            <p className="text-sm">{message.message}</p>
                             <p
-                              className={`mt-1 text-xs ${
-                                isEmployee ? 'text-primary-100' : 'text-slate-500'
-                              }`}
+                              className={`mt-1 text-xs ${isEmployee ? 'text-primary-100' : 'text-slate-500'
+                                }`}
                             >
                               {getRelativeTime(message.sentAt)}
                             </p>
