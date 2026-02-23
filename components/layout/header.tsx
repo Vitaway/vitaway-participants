@@ -7,10 +7,12 @@ import { Bell, LogOut, Sun, Moon } from 'lucide-react';
 import { getProfile, getNotifications } from '@/lib/api';
 import { getInitials } from '@/lib/utils';
 import { useTheme } from '@/lib/theme/theme-context';
+import { useAuth } from '@/lib/auth/auth-context';
 import type { Employee, Notification } from '@/types';
 
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
+  const { logout } = useAuth();
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -120,6 +122,7 @@ export default function Header() {
 
         {/* Logout */}
         <button
+          onClick={logout}
           className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
           title="Logout"
         >

@@ -25,7 +25,23 @@ function saveTokens(tokens: AuthTokens) {
     
     // Also set cookie for middleware
     const maxAge = Math.floor((tokens.expiresAt - Date.now()) / 1000);
-    document.cookie = `vitaway_access_token=${tokens.accessToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
+    console.log('Setting cookie with maxAge:', maxAge, 'seconds (', maxAge / 60, 'minutes)');
+    console.log('Token expiresAt:', new Date(tokens.expiresAt).toISOString());
+    console.log('Current time:', new Date().toISOString());
+    
+    // Ensure maxAge is positive and reasonable (at least 5 minutes)
+    if (maxAge <= 300) {
+      console.warn('Token expires too soon! maxAge:', maxAge);
+    }
+    
+    // Set cookie with proper attributes for Next.js middleware
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `vitaway_access_token=${tokens.accessToken}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+    console.log('Cookie set successfully');
+    
+    // Verify cookie was set
+    const cookieSet = document.cookie.includes('vitaway_access_token=');
+    console.log('Cookie verification:', cookieSet ? 'SUCCESS' : 'FAILED');
   } catch (error) {
     console.error('Error saving tokens:', error);
   }

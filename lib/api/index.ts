@@ -51,6 +51,7 @@ export {
 
 // ─── Appointments Services ──────────────────────────────────────────
 export {
+  getAvailableProviders,
   getAppointments,
   getAppointment,
   bookAppointment,

@@ -144,13 +144,25 @@ export interface ProgramContent {
 }
 
 // ─── Appointments ───────────────────────────────────────────────────
-export type AppointmentType = 'coaching' | 'mental_health' | 'nutrition' | 'general';
+export type AppointmentType = 'coaching' | 'mental_health' | 'nutrition' | 'general' | 'consultation';
 export type AppointmentStatus = 'scheduled' | 'confirmed' | 'rescheduled' | 'cancelled' | 'completed' | 'no_show';
+export type ProviderType = 'user' | 'organization_admin';
+
+export interface Provider {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  specialty?: string;
+  type: ProviderType;
+}
 
 export interface Appointment {
   id: string;
   employeeId: string;
   providerId: string;
+  providerType?: string;
+  partnerOrganizationId?: string;
   appointmentType: AppointmentType;
   appointmentDate: string;
   appointmentTime: string;
@@ -159,18 +171,14 @@ export interface Appointment {
   notes?: string;
   telehealthLink?: string;
   cancellationReason?: string;
-  provider?: {
-    id: string;
-    name: string;
-    email: string;
-    specialty?: string;
-  };
+  providerDetails?: Provider;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface AppointmentBooking {
   providerId: string;
+  providerType: ProviderType;
   appointmentType: AppointmentType;
   appointmentDate: string;
   appointmentTime: string;

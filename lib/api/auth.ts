@@ -38,12 +38,6 @@ export async function login(
 
   const { data } = response;
 
-  // Store token
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('vitaway_access_token', data.access_token);
-    localStorage.setItem('vitaway_token_expires_at', data.expires_at);
-  }
-
   // Transform backend response to frontend format
   const user: AuthUser = {
     id: String(data.user_id),
@@ -55,10 +49,30 @@ export async function login(
     organizationName: '', // Will be fetched from profile
   };
 
+  // Parse token expiry - backend may not provide expires_at
+  let expiresAt: number;
+  
+  if (data.expires_at) {
+    expiresAt = new Date(data.expires_at).getTime();
+    console.log('Backend expires_at:', data.expires_at);
+    console.log('Parsed expiresAt timestamp:', expiresAt);
+    
+    if (isNaN(expiresAt)) {
+      console.warn('Invalid expires_at from backend, using default 30 minutes');
+      expiresAt = Date.now() + 30 * 60 * 1000; // 30 minutes from now
+    }
+  } else {
+    // Backend doesn't provide expires_at, default to 30 minutes
+    console.log('Backend did not provide expires_at, defaulting to 30 minutes');
+    expiresAt = Date.now() + 30 * 60 * 1000;
+  }
+  
+  console.log('Token will expire at:', new Date(expiresAt).toISOString());
+
   const tokens: AuthTokens = {
     accessToken: data.access_token,
     refreshToken: data.access_token, // Backend uses same token
-    expiresAt: new Date(data.expires_at).getTime(),
+    expiresAt,
   };
 
   return { user, tokens };
@@ -67,12 +81,7 @@ export async function login(
 // ─── Logout ─────────────────────────────────────────────────────────
 export async function logout(): Promise<void> {
   await apiClient.post('/api/org/employee/auth/logout');
-  
-  // Clear stored tokens
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('vitaway_access_token');
-    localStorage.removeItem('vitaway_token_expires_at');
-  }
+  // Token cleanup is handled by auth-context clearTokens()
 }
 
 // ─── Get Current User ───────────────────────────────────────────────
@@ -87,13 +96,19 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     const response = await apiClient.get<{ data: any; success: boolean }>('/api/org/employee/profile');
     const profile = response.data;
     
+    console.log('Profile data:', profile);
+    
+    if (!profile.organization_id) {
+      console.error('Profile missing organization_id:', profile);
+    }
+    
     return {
       id: String(profile.id),
       email: profile.email,
       firstName: profile.first_name || '',
       lastName: profile.last_name || '',
       role: 'EMPLOYEE',
-      organizationId: String(profile.organization_id),
+      organizationId: String(profile.organization_id || ''),
       organizationName: profile.organization?.name || '',
     };
   } catch (error) {
