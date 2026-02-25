@@ -6,7 +6,7 @@ import type { DashboardOverview } from '@/types';
 // ─── Get Dashboard Overview ─────────────────────────────────────────
 export async function getDashboardOverview(): Promise<DashboardOverview> {
   const response = await apiClient.get<{ data: any }>(
-    '/api/org/employee/dashboard/overview'
+    '/employee/dashboard/overview'
   );
 
   const data = response.data || {};

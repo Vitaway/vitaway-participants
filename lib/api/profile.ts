@@ -6,7 +6,7 @@ import type { Employee } from "@/types";
 // ─── Get Employee Profile ───────────────────────────────────────────
 export async function getProfile(): Promise<Employee> {
   const response = await apiClient.get<{ data: any }>(
-    "/api/org/employee/profile",
+    "/employee/profile",
   );
 
   const profile = response.data;
@@ -32,7 +32,7 @@ export async function updateProfile(data: {
   preferences?: Record<string, any>;
 }): Promise<Employee> {
   const response = await apiClient.put<{ data: any }>(
-    "/api/org/employee/profile",
+    "/employee/profile",
     {
       phone: data.phone,
       preferences: data.preferences,

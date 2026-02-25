@@ -27,7 +27,7 @@ export interface ConsentHistory {
 export async function getConsentSettings(): Promise<ConsentSetting[]> {
   try {
     const response = await apiClient.get<{ data: any[] }>(
-      '/api/org/employee/consent/settings'
+      '/employee/consent/settings'
     );
     
     return Array.isArray(response.data) ? response.data.map((setting: any) => ({
@@ -52,7 +52,7 @@ export async function updateConsentSetting(data: {
   dataSharingPreferences?: any;
 }): Promise<ConsentSetting> {
   const response = await apiClient.put<any>(
-    '/api/org/employee/consent/settings',
+    '/employee/consent/settings',
     {
       consent_type: data.consentType,
       employer_visibility: data.employerVisibility,
@@ -75,7 +75,7 @@ export async function updateConsentSetting(data: {
 export async function getConsentHistory(): Promise<ConsentHistory[]> {
   try {
     const response = await apiClient.get<{ data: any[] }>(
-      '/api/org/employee/consent/history'
+      '/employee/consent/history'
     );
     
     return Array.isArray(response.data) ? response.data.map((history: any) => ({
@@ -96,5 +96,5 @@ export async function getConsentHistory(): Promise<ConsentHistory[]> {
 
 // ─── Revoke Consent ─────────────────────────────────────────────────
 export async function revokeConsent(consentId: string): Promise<void> {
-  await apiClient.post(`/api/org/employee/consent/${consentId}/revoke`);
+  await apiClient.post(`/employee/consent/${consentId}/revoke`);
 }

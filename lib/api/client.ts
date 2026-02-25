@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // API Client Configuration
 // Handles HTTP requests with authentication and error handling
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -23,27 +25,29 @@ class ApiClient {
   }
 
   private getAuthToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    
-    let token = localStorage.getItem('vitaway_access_token');
-    
+    if (typeof window === "undefined") return null;
+
+    let token = localStorage.getItem("vitaway_access_token");
+
     // Fallback to cookie if localStorage doesn't have it
     if (!token) {
-      const cookies = document.cookie.split(';');
-      const tokenCookie = cookies.find(c => c.trim().startsWith('vitaway_access_token='));
+      const cookies = document.cookie.split(";");
+      const tokenCookie = cookies.find((c) =>
+        c.trim().startsWith("vitaway_access_token="),
+      );
       if (tokenCookie) {
-        token = tokenCookie.split('=')[1];
+        token = tokenCookie.split("=")[1];
         // Re-save to localStorage for future requests
-        localStorage.setItem('vitaway_access_token', token);
+        localStorage.setItem("vitaway_access_token", token);
       }
     }
-    
+
     return token;
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
-    const contentType = response.headers.get('content-type');
-    const isJson = contentType?.includes('application/json');
+    const contentType = response.headers.get("content-type");
+    const isJson = contentType?.includes("application/json");
 
     if (!response.ok) {
       let errorMessage = `HTTP Error: ${response.status}`;
@@ -74,7 +78,7 @@ class ApiClient {
 
   async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
     const url = new URL(`${this.baseURL}${endpoint}`);
-    
+
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -85,18 +89,18 @@ class ApiClient {
 
     const token = this.getAuthToken();
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     };
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     const response = await fetch(url.toString(), {
-      method: 'GET',
+      method: "GET",
       headers,
-      credentials: 'include', // Include cookies for Laravel Sanctum/CORS
+      credentials: "include", // Include cookies for Laravel Sanctum/CORS
     });
 
     return this.handleResponse<T>(response);
@@ -105,18 +109,18 @@ class ApiClient {
   async post<T>(endpoint: string, data?: any): Promise<T> {
     const token = this.getAuthToken();
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     };
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'POST',
+      method: "POST",
       headers,
-      credentials: 'include', // Include cookies for Laravel Sanctum/CORS
+      credentials: "include", // Include cookies for Laravel Sanctum/CORS
       body: data ? JSON.stringify(data) : undefined,
     });
 
@@ -126,18 +130,18 @@ class ApiClient {
   async put<T>(endpoint: string, data?: any): Promise<T> {
     const token = this.getAuthToken();
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     };
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'PUT',
+      method: "PUT",
       headers,
-      credentials: 'include', // Include cookies for Laravel Sanctum/CORS
+      credentials: "include", // Include cookies for Laravel Sanctum/CORS
       body: data ? JSON.stringify(data) : undefined,
     });
 
@@ -147,18 +151,18 @@ class ApiClient {
   async delete<T>(endpoint: string): Promise<T> {
     const token = this.getAuthToken();
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     };
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     const response = await fetch(`${this.baseURL}${endpoint}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers,
-      credentials: 'include', // Include cookies for Laravel Sanctum/CORS
+      credentials: "include", // Include cookies for Laravel Sanctum/CORS
     });
 
     return this.handleResponse<T>(response);

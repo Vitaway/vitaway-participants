@@ -10,7 +10,7 @@ export async function getConversations(params?: {
 }): Promise<{ data: Conversation[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/api/org/employee/messages/conversations',
+      '/employee/messages/conversations',
       {
         per_page: params?.perPage,
         page: params?.page,
@@ -47,7 +47,7 @@ export async function getConversationMessages(
 ): Promise<{ data: Message[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      `/api/org/employee/messages/conversations/${conversationId}`,
+      `/employee/messages/conversations/${conversationId}`,
       {
         per_page: params?.perPage,
         page: params?.page,
@@ -82,7 +82,7 @@ export async function sendMessage(data: {
   conversationId?: string;
 }): Promise<Message> {
   const response = await apiClient.post<{ data: any }>(
-    '/api/org/employee/messages',
+    '/employee/messages',
     {
       recipient_id: data.recipientId,
       recipient_type: data.recipientType,

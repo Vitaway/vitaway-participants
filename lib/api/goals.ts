@@ -12,7 +12,7 @@ export async function getGoals(params?: {
 }): Promise<{ data: Goal[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/api/org/employee/goals',
+      '/employee/goals',
       {
         status: params?.status,
         category: params?.category,
@@ -54,7 +54,7 @@ export async function getGoal(id: string): Promise<{
   progressHistory: GoalProgress[];
 }> {
   const response = await apiClient.get<{ data: any }>(
-    `/api/org/employee/goals/${id}`
+    `/employee/goals/${id}`
   );
 
   const data = response.data;
@@ -97,7 +97,7 @@ export async function updateGoalProgress(
   }
 ): Promise<GoalProgress> {
   const response = await apiClient.post<{ data: any }>(
-    `/api/org/employee/goals/${goalId}/progress`,
+    `/employee/goals/${goalId}/progress`,
     {
       progress_value: data.progressValue,
       notes: data.notes,

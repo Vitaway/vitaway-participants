@@ -11,7 +11,7 @@ export async function getEnrolledPrograms(params?: {
 }): Promise<{ data: ProgramEnrollment[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/api/org/employee/programs',
+      '/employee/programs',
       {
         status: params?.status,
         per_page: params?.perPage,
@@ -54,7 +54,7 @@ export async function getProgramContent(
 ): Promise<ProgramContent[]> {
   try {
     const response = await apiClient.get<{ data: any[] }>(
-      `/api/org/employee/programs/${programId}/content`
+      `/employee/programs/${programId}/content`
     );
 
     return Array.isArray(response.data) ? response.data.map((content: any) => ({
@@ -85,7 +85,7 @@ export async function markContentComplete(
   programCompleted: boolean;
 }> {
   const response = await apiClient.post<any>(
-    `/api/org/employee/programs/${programId}/content/${contentId}/complete`
+    `/employee/programs/${programId}/content/${contentId}/complete`
   );
 
   return {

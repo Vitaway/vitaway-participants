@@ -12,7 +12,7 @@ export async function getNotifications(params?: {
 }): Promise<{ data: Notification[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/api/org/employee/notifications',
+      '/employee/notifications',
       {
         filter: params?.filter,
         type: params?.type,
@@ -46,7 +46,7 @@ export async function getNotifications(params?: {
 // ─── Get Unread Count ───────────────────────────────────────────────
 export async function getUnreadNotificationsCount(): Promise<number> {
   const response = await apiClient.get<{ count: number }>(
-    '/api/org/employee/notifications/unread-count'
+    '/employee/notifications/unread-count'
   );
 
   return response.count;
@@ -55,7 +55,7 @@ export async function getUnreadNotificationsCount(): Promise<number> {
 // ─── Mark All as Read ───────────────────────────────────────────────
 export async function markAllNotificationsAsRead(): Promise<{ message: string }> {
   const response = await apiClient.post<{ message: string }>(
-    '/api/org/employee/notifications/mark-read'
+    '/employee/notifications/mark-read'
   );
 
   return response;
@@ -64,7 +64,7 @@ export async function markAllNotificationsAsRead(): Promise<{ message: string }>
 // ─── Mark Single as Read ────────────────────────────────────────────
 export async function markNotificationAsRead(id: string): Promise<{ message: string }> {
   const response = await apiClient.post<{ message: string }>(
-    `/api/org/employee/notifications/${id}/mark-read`
+    `/employee/notifications/${id}/mark-read`
   );
 
   return response;

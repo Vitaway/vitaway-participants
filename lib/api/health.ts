@@ -13,7 +13,7 @@ export async function getVitals(params?: {
 }): Promise<{ data: VitalReading[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/api/org/employee/health/vitals',
+      '/employee/health/vitals',
       {
         type: params?.type,
         from_date: params?.fromDate,
@@ -54,7 +54,7 @@ export async function getAssessments(params?: {
 }): Promise<{ data: HealthAssessment[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/api/org/employee/health/assessments',
+      '/employee/health/assessments',
       {
         type: params?.type,
         status: params?.status,
@@ -90,7 +90,7 @@ export async function getAssessments(params?: {
 // ─── Get Single Assessment ──────────────────────────────────────────
 export async function getAssessment(id: string): Promise<HealthAssessment> {
   const response = await apiClient.get<{ data: any }>(
-    `/api/org/employee/health/assessments/${id}`
+    `/employee/health/assessments/${id}`
   );
 
   const assessment = response.data;
