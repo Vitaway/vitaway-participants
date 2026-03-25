@@ -41,6 +41,7 @@ export const ROUTES = {
   HEALTH: '/dashboard/health',
   GOALS: '/dashboard/goals',
   PROGRAMS: '/dashboard/programs',
+  MEAL_PLANS: '/dashboard/meal-plans',
   APPOINTMENTS: '/dashboard/appointments',
   PROFILE: '/dashboard/profile',
   CONSENT: '/dashboard/consent',

@@ -13,6 +13,7 @@ import {
   User,
   Shield,
   Bell,
+  UtensilsCrossed,
 } from 'lucide-react';
 import { ROUTES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
@@ -22,6 +23,7 @@ const navigation = [
   { name: 'Health Overview', href: ROUTES.HEALTH, icon: Activity },
   { name: 'Goals & Progress', href: ROUTES.GOALS, icon: Target },
   { name: 'Programs', href: ROUTES.PROGRAMS, icon: BookOpen },
+  { name: 'Meal Plans', href: ROUTES.MEAL_PLANS, icon: UtensilsCrossed },
   { name: 'Appointments', href: ROUTES.APPOINTMENTS, icon: Calendar },
   { name: 'Notifications', href: ROUTES.NOTIFICATIONS, icon: Bell },
   { name: 'Profile', href: ROUTES.PROFILE, icon: User },

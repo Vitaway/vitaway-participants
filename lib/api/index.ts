@@ -82,3 +82,10 @@ export {
   revokeConsent,
 } from './consent';
 export type { ConsentSetting, ConsentHistory } from './consent';
+
+// ─── Meal Plans ─────────────────────────────────────────────────────
+export {
+  getMealPlans,
+  getMealPlan,
+} from './mealplans';
+export type { MealPlanSummary, MealPlanDetail, MealPlanItem, MealPlanDay } from './mealplans';

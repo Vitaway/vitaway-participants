@@ -9,6 +9,7 @@ import {
     BookOpen,
     MessageSquare,
     Settings,
+    UtensilsCrossed,
     Loader2,
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
@@ -29,6 +30,7 @@ const TYPE_ICONS: Record<NotificationType, React.ReactNode> = {
     program: <BookOpen className="h-5 w-5 text-purple-500" />,
     message: <MessageSquare className="h-5 w-5 text-primary-500" />,
     system: <Settings className="h-5 w-5 text-slate-500 dark:text-slate-400" />,
+    meal_plan: <UtensilsCrossed className="h-5 w-5 text-orange-500" />,
 };
 
 const PRIORITY_VARIANTS: Record<string, 'error' | 'warning' | 'info'> = {

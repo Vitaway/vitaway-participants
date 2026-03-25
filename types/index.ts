@@ -259,7 +259,7 @@ export interface AppointmentBooking {
 }
 
 // ─── Notifications ──────────────────────────────────────────────────
-export type NotificationType = 'appointment' | 'goal' | 'program' | 'message' | 'system';
+export type NotificationType = 'appointment' | 'goal' | 'program' | 'message' | 'system' | 'meal_plan';
 export type NotificationPriority = 'low' | 'normal' | 'high';
 
 export interface Notification {
