@@ -2,8 +2,11 @@
 // API Client Configuration
 // Handles HTTP requests with authentication and error handling
 
-const API_BASE_URL =
+// Strip any trailing /api/organization path from base URL to avoid doubling,
+// since all endpoints already include the full /api/organization/employee/... path
+const RAW_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE_URL = RAW_BASE_URL.replace(/\/api\/organization\/?$/, "").replace(/\/+$/, "");
 
 export interface ApiResponse<T = any> {
   data: T;
