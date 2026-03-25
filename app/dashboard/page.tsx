@@ -11,6 +11,7 @@ import {
   Award,
   Activity,
   ArrowRight,
+  Loader2,
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
@@ -61,7 +62,10 @@ export default function DashboardHome() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-slate-500">Loading your dashboard...</p>
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+            <p className="text-slate-500 dark:text-slate-400">Loading your dashboard...</p>
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -73,7 +77,7 @@ export default function DashboardHome() {
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
             <p className="text-red-500 mb-2">Failed to load dashboard</p>
-            <p className="text-slate-500 text-sm">{error || 'Unknown error'}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">{error || 'Unknown error'}</p>
             <Button 
               onClick={() => window.location.reload()} 
               className="mt-4"
@@ -98,7 +102,7 @@ export default function DashboardHome() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Dashboard</h1>
-          <p className="mt-1 text-slate-600">
+          <p className="mt-1 text-slate-600 dark:text-slate-400">
             Track your health journey and stay on top of your goals
           </p>
         </div>
@@ -107,60 +111,60 @@ export default function DashboardHome() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-primary-100 p-3">
-                <Calendar className="h-6 w-6 text-primary-600" />
+              <div className="rounded-full bg-primary-100 dark:bg-primary-900/30 p-3">
+                <Calendar className="h-6 w-6 text-primary-600 dark:text-primary-400" />
               </div>
               <div>
-                <p className="text-sm text-slate-600">Upcoming</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Upcoming</p>
                 <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {dashboard.upcomingAppointments.length}
                 </p>
-                <p className="text-xs text-slate-500">Appointments</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Appointments</p>
               </div>
             </div>
           </Card>
 
           <Card>
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-green-100 p-3">
-                <Target className="h-6 w-6 text-green-600" />
+              <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-3">
+                <Target className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <p className="text-sm text-slate-600">Active</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Active</p>
                 <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {dashboard.pendingGoals.active}
                 </p>
-                <p className="text-xs text-slate-500">Goals</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Goals</p>
               </div>
             </div>
           </Card>
 
           <Card>
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-purple-100 p-3">
-                <TrendingUp className="h-6 w-6 text-purple-600" />
+              <div className="rounded-full bg-purple-100 dark:bg-purple-900/30 p-3">
+                <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <p className="text-sm text-slate-600">Program</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Program</p>
                 <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {Math.round(dashboard.stats.programCompletionRate)}%
                 </p>
-                <p className="text-xs text-slate-500">Complete</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Complete</p>
               </div>
             </div>
           </Card>
 
           <Card>
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-orange-100 p-3">
-                <Award className="h-6 w-6 text-orange-600" />
+              <div className="rounded-full bg-orange-100 dark:bg-orange-900/30 p-3">
+                <Award className="h-6 w-6 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <p className="text-sm text-slate-600">Streak</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Streak</p>
                 <p className="text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {dashboard.stats.currentStreak}
                 </p>
-                <p className="text-xs text-slate-500">Days</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Days</p>
               </div>
             </div>
           </Card>
@@ -171,40 +175,40 @@ export default function DashboardHome() {
           {/* Latest Vitals */}
           <Card title="Latest Vitals" className="lg:col-span-2">
             <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-lg border border-slate-200 p-4">
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-slate-600">Weight</p>
-                  <Activity className="h-4 w-4 text-slate-400" />
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Weight</p>
+                  <Activity className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 </div>
                 <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {latestWeight ? `${latestWeight.value} ${latestWeight.unit}` : 'N/A'}
                 </p>
                 {latestWeight && (
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     {formatDate(latestWeight.recordedAt)}
                   </p>
                 )}
               </div>
 
-              <div className="rounded-lg border border-slate-200 p-4">
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-slate-600">BMI</p>
-                  <Activity className="h-4 w-4 text-slate-400" />
+                  <p className="text-sm text-slate-600 dark:text-slate-400">BMI</p>
+                  <Activity className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 </div>
                 <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {latestBMI ? `${latestBMI.value}` : 'N/A'}
                 </p>
                 {latestBMI && (
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     {formatDate(latestBMI.recordedAt)}
                   </p>
                 )}
               </div>
 
-              <div className="rounded-lg border border-slate-200 p-4">
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-slate-600">Blood Pressure</p>
-                  <Activity className="h-4 w-4 text-slate-400" />
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Blood Pressure</p>
+                  <Activity className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 </div>
                 <p className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-50">
                   {latestBP && isBloodPressureValue(latestBP.value)
@@ -212,7 +216,7 @@ export default function DashboardHome() {
                     : 'N/A'}
                 </p>
                 {latestBP && (
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     {formatDate(latestBP.recordedAt)}
                   </p>
                 )}
@@ -232,22 +236,22 @@ export default function DashboardHome() {
           <Card title="Upcoming Appointments">
             <div className="space-y-3">
               {upcomingAppointments.length === 0 ? (
-                <p className="py-8 text-center text-sm text-slate-500">
+                <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
                   No upcoming appointments
                 </p>
               ) : (
                 upcomingAppointments.slice(0, 3).map((appointment) => (
                   <div
                     key={appointment.id}
-                    className="rounded-lg border border-slate-200 p-3"
+                    className="rounded-lg border border-slate-200 dark:border-slate-700 p-3"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="font-medium text-slate-800 dark:text-slate-50">{appointment.appointmentType}</p>
-                        <p className="mt-1 text-sm text-slate-600">
+                        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                           {appointment.providerDetails?.name || 'Provider TBD'}
                         </p>
-                        <p className="mt-1 text-xs text-slate-500">
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                           {formatDate(appointment.appointmentDate)} at {appointment.appointmentTime}
                         </p>
                       </div>
@@ -274,7 +278,7 @@ export default function DashboardHome() {
           <Card title="Goal Progress">
             <div className="space-y-4">
               {activeGoals.length === 0 ? (
-                <p className="py-8 text-center text-sm text-slate-500">
+                <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
                   No active goals
                 </p>
               ) : (
@@ -284,10 +288,10 @@ export default function DashboardHome() {
                     <div key={goal.id}>
                       <div className="flex items-center justify-between">
                         <p className="font-medium text-slate-800 dark:text-slate-50">{goal.title}</p>
-                        <span className="text-sm text-slate-600">{progress}%</span>
+                        <span className="text-sm text-slate-600 dark:text-slate-400">{progress}%</span>
                       </div>
                       <ProgressBar value={progress} className="mt-2" />
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                         {goal.currentValue} / {goal.targetValue} {goal.unit}
                       </p>
                     </div>
@@ -309,11 +313,11 @@ export default function DashboardHome() {
           <Card title="Recent Notifications">
             <div className="space-y-3">
               {dashboard.unreadNotifications === 0 ? (
-                <p className="py-8 text-center text-sm text-slate-500">
+                <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
                   No unread notifications
                 </p>
               ) : (
-                <div className="rounded-lg border border-primary-200 bg-primary-50 p-4">
+                <div className="rounded-lg border border-primary-200 dark:border-primary-700/50 bg-primary-50 dark:bg-primary-900/20 p-4">
                   <div className="flex items-center gap-3">
                     <MessageSquare className="h-5 w-5 text-primary-600" />
                     <div>

@@ -33,7 +33,7 @@ export async function login(
   credentials: LoginCredentials,
 ): Promise<{ user: AuthUser; tokens: AuthTokens }> {
   const response = await apiClient.post<LoginResponse>(
-    "/employee/auth/login",
+    "/api/organization/employee/auth/login",
     credentials,
   );
 
@@ -81,7 +81,7 @@ export async function login(
 
 // ─── Logout ─────────────────────────────────────────────────────────
 export async function logout(): Promise<void> {
-  await apiClient.post("/employee/auth/logout");
+  await apiClient.post("/api/organization/employee/auth/logout");
 }
 
 // ─── Get Current User ───────────────────────────────────────────────
@@ -94,26 +94,26 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   try {
     // Fetch employee profile to get current user data
     const response = await apiClient.get<{ data: any; success: boolean }>(
-      "/employee/profile",
+      "/api/organization/employee/profile",
     );
     const profile = response.data;
 
     console.log("Profile data:", profile);
 
-    if (!profile.organization_id) {
+    if (!profile.organization_id && !profile.organization?.id) {
       console.error("Profile missing organization_id:", profile);
     }
 
     return {
       id: String(profile.id),
       email: profile.email,
-      firstName: profile.first_name || "",
-      lastName: profile.last_name || "",
+      firstName: profile.first_name || profile.firstname || "",
+      lastName: profile.last_name || profile.lastname || "",
       role: "EMPLOYEE",
-      organizationId: String(profile.organization_id || ""),
+      organizationId: String(profile.organization_id || profile.organization?.id || ""),
       organizationName: profile.organization?.name || "",
     };
-  } catch (error) {
+  } catch {
     // Token is invalid, clear it
     localStorage.removeItem("vitaway_access_token");
     localStorage.removeItem("vitaway_token_expires_at");
@@ -122,9 +122,9 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 }
 
 // ─── Refresh Token ──────────────────────────────────────────────────
-export async function refreshToken(_refreshToken: string): Promise<AuthTokens> {
+export async function refreshToken(): Promise<AuthTokens> {
   const response = await apiClient.post<LoginResponse>(
-    "/employee/auth/refresh",
+    "/api/organization/employee/auth/refresh",
   );
 
   // Store new token

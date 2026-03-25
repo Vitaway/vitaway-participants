@@ -1,4 +1,5 @@
 // Goals & Progress API Service
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { apiClient } from './client';
 import type { Goal, GoalProgress } from '@/types';
@@ -12,7 +13,7 @@ export async function getGoals(params?: {
 }): Promise<{ data: Goal[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/employee/goals',
+      '/api/organization/employee/goals',
       {
         status: params?.status,
         category: params?.category,
@@ -21,8 +22,9 @@ export async function getGoals(params?: {
       }
     );
 
+    const goalsRaw: any[] = (response as any).data?.data ?? (Array.isArray((response as any).data) ? (response as any).data : []);
     return {
-      data: Array.isArray(response.data) ? response.data.map((goal: any) => ({
+      data: goalsRaw.map((goal: any) => ({
       id: String(goal.id),
       employeeId: String(goal.employee_id),
       title: goal.title,
@@ -39,8 +41,8 @@ export async function getGoals(params?: {
       progressPercentage: goal.progress_percentage || 0,
       createdAt: goal.created_at,
       updatedAt: goal.updated_at,
-    })) : [],
-      meta: response.meta || {},
+    })),
+      meta: (response as any).data?.meta ?? (response as any).meta ?? {},
     };
   } catch (error: any) {
     console.error('Failed to fetch goals:', error);
@@ -54,7 +56,7 @@ export async function getGoal(id: string): Promise<{
   progressHistory: GoalProgress[];
 }> {
   const response = await apiClient.get<{ data: any }>(
-    `/employee/goals/${id}`
+    `/api/organization/employee/goals/${id}`
   );
 
   const data = response.data;
@@ -97,7 +99,7 @@ export async function updateGoalProgress(
   }
 ): Promise<GoalProgress> {
   const response = await apiClient.post<{ data: any }>(
-    `/employee/goals/${goalId}/progress`,
+    `/api/organization/employee/goals/${goalId}/progress`,
     {
       progress_value: data.progressValue,
       notes: data.notes,

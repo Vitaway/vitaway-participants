@@ -10,8 +10,7 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
-import { useRouter } from 'next/navigation';
-import type { AuthUser, AuthTokens, AuthState } from '@/types/auth';
+import type { AuthTokens, AuthState } from '@/types/auth';
 import * as authApi from '@/lib/api/auth';
 
 // ─── Token helpers ──────────────────────────────────────────────────
@@ -97,7 +96,6 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const router = useRouter();
   const [state, setState] = useState<AuthState>({
     user: null,
     tokens: null,

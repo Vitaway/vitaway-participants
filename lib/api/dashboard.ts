@@ -1,4 +1,5 @@
 // Dashboard API Service
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { apiClient } from './client';
 import type { DashboardOverview } from '@/types';
@@ -6,7 +7,7 @@ import type { DashboardOverview } from '@/types';
 // ─── Get Dashboard Overview ─────────────────────────────────────────
 export async function getDashboardOverview(): Promise<DashboardOverview> {
   const response = await apiClient.get<{ data: any }>(
-    '/employee/dashboard/overview'
+    '/api/organization/employee/dashboard/overview'
   );
 
   const data = response.data || {};

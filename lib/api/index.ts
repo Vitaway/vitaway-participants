@@ -45,8 +45,14 @@ export {
 // ─── Programs Services ──────────────────────────────────────────────
 export {
   getEnrolledPrograms,
-  getProgramContent,
-  markContentComplete,
+  getProgram,
+  startProgram,
+  getModule,
+  completeModule,
+  getModuleQuiz,
+  submitModuleQuiz,
+  getFinalQuiz,
+  submitFinalQuiz,
 } from './programs';
 
 // ─── Appointments Services ──────────────────────────────────────────
@@ -59,13 +65,6 @@ export {
   cancelAppointment,
   getTelehealthLink,
 } from './appointments';
-
-// ─── Messages Services ──────────────────────────────────────────────
-export {
-  getConversations,
-  getConversationMessages,
-  sendMessage,
-} from './messages';
 
 // ─── Notifications Services ─────────────────────────────────────────
 export {

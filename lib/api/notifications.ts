@@ -1,4 +1,5 @@
 // Notifications API Service
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { apiClient } from './client';
 import type { Notification } from '@/types';
@@ -12,7 +13,7 @@ export async function getNotifications(params?: {
 }): Promise<{ data: Notification[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/employee/notifications',
+      '/api/organization/employee/notifications',
       {
         filter: params?.filter,
         type: params?.type,
@@ -21,8 +22,9 @@ export async function getNotifications(params?: {
       }
     );
 
+    const notificationsRaw: any[] = (response as any).data?.data ?? (Array.isArray((response as any).data) ? (response as any).data : []);
     return {
-      data: Array.isArray(response.data) ? response.data.map((notification: any) => ({
+      data: notificationsRaw.map((notification: any) => ({
       id: String(notification.id),
       employeeId: String(notification.employee_id),
       type: notification.type,
@@ -33,8 +35,8 @@ export async function getNotifications(params?: {
       isRead: notification.is_read || false,
       createdAt: notification.created_at,
       readAt: notification.read_at,
-    })) : [],
-      meta: response.meta || {},
+    })),
+      meta: (response as any).data?.meta ?? (response as any).meta ?? {},
     };
   } catch (error: any) {
     console.error('Failed to fetch notifications:', error);
@@ -46,7 +48,7 @@ export async function getNotifications(params?: {
 // ─── Get Unread Count ───────────────────────────────────────────────
 export async function getUnreadNotificationsCount(): Promise<number> {
   const response = await apiClient.get<{ count: number }>(
-    '/employee/notifications/unread-count'
+    '/api/organization/employee/notifications/unread-count'
   );
 
   return response.count;
@@ -55,7 +57,7 @@ export async function getUnreadNotificationsCount(): Promise<number> {
 // ─── Mark All as Read ───────────────────────────────────────────────
 export async function markAllNotificationsAsRead(): Promise<{ message: string }> {
   const response = await apiClient.post<{ message: string }>(
-    '/employee/notifications/mark-read'
+    '/api/organization/employee/notifications/mark-read'
   );
 
   return response;
@@ -64,7 +66,7 @@ export async function markAllNotificationsAsRead(): Promise<{ message: string }>
 // ─── Mark Single as Read ────────────────────────────────────────────
 export async function markNotificationAsRead(id: string): Promise<{ message: string }> {
   const response = await apiClient.post<{ message: string }>(
-    `/employee/notifications/${id}/mark-read`
+    `/api/organization/employee/notifications/${id}/mark-read`
   );
 
   return response;

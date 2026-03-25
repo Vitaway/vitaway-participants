@@ -1,4 +1,5 @@
 // Consent Management API
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { apiClient } from './client';
 
@@ -27,7 +28,7 @@ export interface ConsentHistory {
 export async function getConsentSettings(): Promise<ConsentSetting[]> {
   try {
     const response = await apiClient.get<{ data: any[] }>(
-      '/employee/consent/settings'
+      '/api/organization/employee/consent/settings'
     );
     
     return Array.isArray(response.data) ? response.data.map((setting: any) => ({
@@ -52,7 +53,7 @@ export async function updateConsentSetting(data: {
   dataSharingPreferences?: any;
 }): Promise<ConsentSetting> {
   const response = await apiClient.put<any>(
-    '/employee/consent/settings',
+    '/api/organization/employee/consent/settings',
     {
       consent_type: data.consentType,
       employer_visibility: data.employerVisibility,
@@ -75,10 +76,11 @@ export async function updateConsentSetting(data: {
 export async function getConsentHistory(): Promise<ConsentHistory[]> {
   try {
     const response = await apiClient.get<{ data: any[] }>(
-      '/employee/consent/history'
+      '/api/organization/employee/consent/history'
     );
     
-    return Array.isArray(response.data) ? response.data.map((history: any) => ({
+    const historyRaw: any[] = (response as any).data?.data ?? (Array.isArray((response as any).data) ? (response as any).data : []);
+    return historyRaw.map((history: any) => ({
     id: String(history.id),
     consentId: String(history.consent_id),
     action: history.action,
@@ -87,7 +89,7 @@ export async function getConsentHistory(): Promise<ConsentHistory[]> {
     changedAt: history.changed_at,
     ipAddress: history.ip_address,
     userAgent: history.user_agent,
-  })) : [];
+  }));
   } catch (error: any) {
     console.error('Failed to fetch consent history:', error);
     return [];
@@ -96,5 +98,5 @@ export async function getConsentHistory(): Promise<ConsentHistory[]> {
 
 // ─── Revoke Consent ─────────────────────────────────────────────────
 export async function revokeConsent(consentId: string): Promise<void> {
-  await apiClient.post(`/employee/consent/${consentId}/revoke`);
+  await apiClient.post(`/api/organization/employee/consent/${consentId}/revoke`);
 }

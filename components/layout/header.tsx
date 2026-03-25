@@ -2,12 +2,14 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Bell, LogOut, Sun, Moon } from 'lucide-react';
-import { getProfile, getNotifications } from '@/lib/api';
-import { getInitials } from '@/lib/utils';
+import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { Bell, LogOut, Sun, Moon, CheckCheck } from 'lucide-react';
+import { getProfile, getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/lib/api';
+import { getInitials, getRelativeTime } from '@/lib/utils';
 import { useTheme } from '@/lib/theme/theme-context';
 import { useAuth } from '@/lib/auth/auth-context';
+import { ROUTES } from '@/lib/constants';
 import type { Employee, Notification } from '@/types';
 
 export default function Header() {
@@ -16,6 +18,18 @@ export default function Header() {
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowNotifications(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -34,6 +48,26 @@ export default function Header() {
   }, []);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  async function handleMarkRead(id: string) {
+    try {
+      await markNotificationAsRead(id);
+      setNotifications(prev =>
+        prev.map(n => n.id === id ? { ...n, isRead: true, readAt: new Date().toISOString() } : n)
+      );
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  }
+
+  async function handleMarkAllRead() {
+    try {
+      await markAllNotificationsAsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true, readAt: new Date().toISOString() })));
+    } catch (error) {
+      console.error('Failed to mark all as read:', error);
+    }
+  }
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-6 shadow-sm">
@@ -59,7 +93,7 @@ export default function Header() {
         </button>
 
         {/* Notifications */}
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
@@ -75,8 +109,17 @@ export default function Header() {
           {/* Notification Dropdown */}
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg z-50">
-              <div className="border-b border-slate-200 dark:border-slate-700 px-4 py-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-4 py-3">
                 <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-50">Notifications</h3>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:underline"
+                  >
+                    <CheckCheck className="h-3 w-3" />
+                    Mark all read
+                  </button>
+                )}
               </div>
               <div className="max-h-96 overflow-y-auto">
                 {notifications.length === 0 ? (
@@ -87,19 +130,44 @@ export default function Header() {
                   notifications.slice(0, 5).map((notification) => (
                     <div
                       key={notification.id}
-                      className={`border-b border-slate-100 dark:border-slate-700 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${
-                        !notification.isRead ? 'bg-primary-50 dark:bg-primary-900/20' : ''
+                      className={`group border-b border-slate-100 dark:border-slate-700 px-4 py-3 transition-colors ${
+                        !notification.isRead
+                          ? 'bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-700'
                       }`}
                     >
-                      <p className="text-sm font-medium text-slate-800 dark:text-slate-50">
-                        {notification.title}
-                      </p>
-                      <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-                        {notification.message}
-                      </p>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-800 dark:text-slate-50 truncate">
+                            {notification.title}
+                          </p>
+                          <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
+                            {notification.message}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                            {getRelativeTime(notification.createdAt)}
+                          </p>
+                        </div>
+                        {!notification.isRead && (
+                          <button
+                            onClick={() => handleMarkRead(notification.id)}
+                            className="mt-0.5 flex-shrink-0 h-2 w-2 rounded-full bg-primary-500 hover:bg-primary-400 transition-colors"
+                            title="Mark as read"
+                          />
+                        )}
+                      </div>
                     </div>
                   ))
                 )}
+              </div>
+              <div className="border-t border-slate-200 dark:border-slate-700 px-4 py-2">
+                <Link
+                  href={ROUTES.NOTIFICATIONS}
+                  onClick={() => setShowNotifications(false)}
+                  className="text-xs text-primary-600 dark:text-primary-400 hover:underline"
+                >
+                  View all notifications →
+                </Link>
               </div>
             </div>
           )}

@@ -27,13 +27,6 @@ export const APPOINTMENT_TYPES = {
   GENERAL: 'general',
 } as const;
 
-export const MESSAGE_TYPES = {
-  EMPLOYEE: 'EMPLOYEE',
-  COACH: 'COACH',
-  CLINICIAN: 'CLINICIAN',
-  SUPPORT: 'SUPPORT',
-} as const;
-
 export const NOTIFICATION_TYPES = {
   APPOINTMENT: 'APPOINTMENT',
   PROGRAM: 'PROGRAM',
@@ -49,9 +42,9 @@ export const ROUTES = {
   GOALS: '/dashboard/goals',
   PROGRAMS: '/dashboard/programs',
   APPOINTMENTS: '/dashboard/appointments',
-  MESSAGES: '/dashboard/messages',
   PROFILE: '/dashboard/profile',
   CONSENT: '/dashboard/consent',
+  NOTIFICATIONS: '/dashboard/notifications',
   // Auth
   LOGIN: '/auth/login',
   FORGOT_PASSWORD: '/auth/forgot-password',
@@ -83,11 +76,7 @@ export const API_ENDPOINTS = {
   
   // Appointments
   APPOINTMENTS: '/api/organization/employee/appointments',
-  
-  // Messages
-  CONVERSATIONS: '/api/organization/employee/messages/conversations',
-  MESSAGES: '/api/organization/employee/messages',
-  
+
   // Notifications
   NOTIFICATIONS: '/api/organization/employee/notifications',
   

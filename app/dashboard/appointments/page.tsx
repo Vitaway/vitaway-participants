@@ -13,13 +13,14 @@ import {
   Plus,
   Filter,
   Building2,
+  Loader2,
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {Button } from '@/components/ui/button';
 import { BookAppointmentModal } from '@/components/appointments/book-appointment-modal';
-import { getAppointments } from '@/lib/api/appointments';
+import { getAppointments, cancelAppointment } from '@/lib/api/appointments';
 import type { Appointment, AppointmentStatus } from '@/types';
 
 export default function AppointmentsPage() {
@@ -28,15 +29,18 @@ export default function AppointmentsPage() {
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('upcoming');
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus | 'all'>('all');
   const [showBookModal, setShowBookModal] = useState(false);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState<Appointment | null>(null);
 
   useEffect(() => {
     loadAppointments();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, statusFilter]);
 
   async function loadAppointments() {
     setLoading(true);
     try {
-      const params: any = {};
+      const params: Record<string, string> = {};
       
       if (filter !== 'all') {
         params.filter = filter;
@@ -124,7 +128,10 @@ export default function AppointmentsPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-slate-500 dark:text-slate-400">Loading appointments...</p>
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+            <p className="text-slate-500 dark:text-slate-400">Loading appointments...</p>
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -199,7 +206,7 @@ export default function AppointmentsPage() {
         <Card>
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-slate-500" />
+              <Filter className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Filters:
               </span>
@@ -300,7 +307,7 @@ export default function AppointmentsPage() {
                                     )}
                                   </div>
                                   {appointment.providerDetails.specialty && (
-                                    <div className="text-xs text-slate-500 dark:text-slate-500 ml-6">
+                                    <div className="text-xs text-slate-500 dark:text-slate-400 ml-6">
                                       {appointment.providerDetails.specialty}
                                     </div>
                                   )}
@@ -361,10 +368,8 @@ export default function AppointmentsPage() {
                         )}
                         <Button
                           variant="outline"
-                          onClick={() => {
-                            // TODO: Implement cancel
-                            console.log('Cancel appointment:', appointment.id);
-                          }}
+                          onClick={() => setConfirmCancel(appointment)}
+                          disabled={cancellingId === appointment.id}
                           className="flex items-center gap-2 text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
                         >
                           <XCircle className="h-4 w-4" />
@@ -388,6 +393,39 @@ export default function AppointmentsPage() {
           loadAppointments();
         }}
       />
+
+      {/* Cancel Confirmation Dialog */}
+      {confirmCancel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-sm rounded-xl bg-white dark:bg-slate-800 p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Cancel Appointment</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+              Are you sure you want to cancel your {getTypeLabel(confirmCancel.appointmentType)} appointment on {formatDate(confirmCancel.appointmentDate)}?
+            </p>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setConfirmCancel(null)}>Keep</Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white"
+                disabled={!!cancellingId}
+                onClick={async () => {
+                  try {
+                    setCancellingId(confirmCancel.id);
+                    await cancelAppointment(confirmCancel.id);
+                    setConfirmCancel(null);
+                    loadAppointments();
+                  } catch (error) {
+                    console.error('Failed to cancel appointment:', error);
+                  } finally {
+                    setCancellingId(null);
+                  }
+                }}
+              >
+                {cancellingId ? 'Cancelling...' : 'Cancel Appointment'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

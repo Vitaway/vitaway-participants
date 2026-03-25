@@ -10,9 +10,9 @@ import {
   Target,
   BookOpen,
   Calendar,
-  MessageSquare,
   User,
   Shield,
+  Bell,
 } from 'lucide-react';
 import { ROUTES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
@@ -23,7 +23,7 @@ const navigation = [
   { name: 'Goals & Progress', href: ROUTES.GOALS, icon: Target },
   { name: 'Programs', href: ROUTES.PROGRAMS, icon: BookOpen },
   { name: 'Appointments', href: ROUTES.APPOINTMENTS, icon: Calendar },
-  { name: 'Messages', href: ROUTES.MESSAGES, icon: MessageSquare },
+  { name: 'Notifications', href: ROUTES.NOTIFICATIONS, icon: Bell },
   { name: 'Profile', href: ROUTES.PROFILE, icon: User },
   { name: 'Privacy & Consent', href: ROUTES.CONSENT, icon: Shield },
 ];
@@ -59,13 +59,6 @@ export default function Sidebar() {
           );
         })}
       </nav>
-
-      {/* Footer */}
-      <div className="border-t border-slate-200 dark:border-slate-700 px-6 py-4">
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          Employee Portal v1.0
-        </p>
-      </div>
     </div>
   );
 }

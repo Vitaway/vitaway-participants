@@ -105,8 +105,9 @@ export interface GoalProgress {
 }
 
 // ─── Programs & Learning ────────────────────────────────────────────
-export type ProgramStatus = 'not_started' | 'in_progress' | 'completed' | 'paused';
+export type ProgramStatus = 'not_started' | 'in_progress' | 'completed' | 'paused' | 'not_enrolled' | 'enrolled';
 export type ContentType = 'video' | 'article' | 'quiz' | 'exercise' | 'document';
+export type ModuleStatus = 'not_started' | 'in_progress' | 'completed';
 
 export interface Program {
   id: string;
@@ -117,6 +118,74 @@ export interface Program {
   durationMinutes?: number;
   totalContent: number;
   createdAt: string;
+  modules?: ProgramModule[];
+  quizzes?: ProgramQuiz[];
+}
+
+export interface ProgramModule {
+  id: string;
+  programId: string;
+  title: string;
+  description?: string;
+  content?: string;
+  contentType?: ContentType;
+  contentUrl?: string;
+  durationMinutes?: number;
+  orderIndex: number;
+  requiresQuizPass?: boolean;
+  quiz?: ProgramQuiz;
+}
+
+export interface ProgramQuiz {
+  id: string;
+  programId?: string;
+  moduleId?: string;
+  title: string;
+  description?: string;
+  quizType: 'module_quiz' | 'final_quiz';
+  passingScore: number;
+  maxAttempts: number;
+  timeLimitMinutes?: number;
+  questions?: QuizQuestion[];
+}
+
+export interface QuizQuestion {
+  id: string;
+  quizId: string;
+  questionText: string;
+  questionType: 'multiple_choice' | 'true_false';
+  points: number;
+  orderIndex: number;
+  answers: QuizAnswer[];
+}
+
+export interface QuizAnswer {
+  id: string;
+  questionId: string;
+  answerText: string;
+  isCorrect?: boolean; // Only visible after submission
+}
+
+export interface ModuleProgress {
+  id: string;
+  moduleId?: string;
+  quizId?: string;
+  moduleStatus: ModuleStatus;
+  moduleCompletionPercentage: number;
+  moduleCompletedAt?: string;
+  quizAttempts: number;
+  quizScore?: number;
+  quizPassed?: boolean;
+  quizPassedAt?: string;
+  lastAccessedAt?: string;
+}
+
+export interface QuizSubmissionResult {
+  score: number;
+  passed: boolean;
+  passingScore: number;
+  progress?: ModuleProgress;
+  status?: string;
 }
 
 export interface ProgramEnrollment {
@@ -129,6 +198,8 @@ export interface ProgramEnrollment {
   enrolledAt: string;
   completedAt?: string;
   dueDate?: string;
+  startedAt?: string;
+  finalScore?: number;
 }
 
 export interface ProgramContent {
@@ -185,33 +256,6 @@ export interface AppointmentBooking {
   appointmentTime: string;
   durationMinutes: number;
   notes?: string;
-}
-
-// ─── Communication ──────────────────────────────────────────────────
-export type ParticipantType = 'coach' | 'clinician' | 'support';
-
-export interface Conversation {
-  id: string;
-  employeeId: string;
-  participantId: string;
-  participantType: ParticipantType;
-  participantName?: string;
-  lastMessageAt?: string;
-  unreadCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Message {
-  id: string;
-  conversationId: string;
-  senderId: string;
-  senderType: string;
-  senderName?: string;
-  message: string;
-  isRead: boolean;
-  sentAt: string;
-  readAt?: string;
 }
 
 // ─── Notifications ──────────────────────────────────────────────────

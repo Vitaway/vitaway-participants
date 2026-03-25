@@ -21,24 +21,21 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    const [theme, setThemeState] = useState<Theme>('light');
-    const [mounted, setMounted] = useState(false);
-
-    // Load theme from localStorage on mount
-    useEffect(() => {
-        setMounted(true);
-        const savedTheme = localStorage.getItem('vitaway_theme') as Theme | null;
-        // Always default to 'light' if not set
-        const initialTheme = savedTheme || 'light';
-        setThemeState(initialTheme);
-        applyTheme(initialTheme);
-    }, []);
+    const [theme, setThemeState] = useState<Theme>(() => {
+        if (typeof window === 'undefined') return 'light';
+        return (localStorage.getItem('vitaway_theme') as Theme) || 'light';
+    });
 
     const applyTheme = (newTheme: Theme) => {
         const root = document.documentElement;
         root.classList.remove('light', 'dark');
         root.classList.add(newTheme);
     };
+
+    // Apply theme to DOM on mount and when theme changes
+    useEffect(() => {
+        applyTheme(theme);
+    }, [theme]);
 
     const setTheme = (newTheme: Theme) => {
         setThemeState(newTheme);

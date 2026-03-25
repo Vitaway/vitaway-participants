@@ -1,4 +1,5 @@
 // Appointments API Service
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { apiClient } from './client';
 import type { Appointment, AppointmentBooking, Provider } from '@/types';
@@ -18,7 +19,7 @@ export async function getAvailableProviders(params?: {
     console.log('Fetching providers with params:', queryParams);
 
     const response = await apiClient.get<{ data: any[] }>(
-      '/organization/api/employee/appointments/available-providers',
+      '/api/organization/employee/appointments/available-providers',
       queryParams
     );
 
@@ -46,7 +47,7 @@ export async function getAppointments(params?: {
 }): Promise<{ data: Appointment[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any; meta?: any }>(
-      '/organization/api/employee/appointments',
+      '/api/organization/employee/appointments',
       {
         status: params?.status,
         type: params?.type,
@@ -99,7 +100,7 @@ export async function getAppointments(params?: {
 // ─── Get Single Appointment ─────────────────────────────────────────
 export async function getAppointment(id: string): Promise<Appointment> {
   const response = await apiClient.get<{ data: any }>(
-    `/organization/api/employee/appointments/${id}`
+    `/api/organization/employee/appointments/${id}`
   );
 
   const appointment = response.data;
@@ -137,7 +138,7 @@ export async function bookAppointment(
   data: AppointmentBooking
 ): Promise<Appointment> {
   const response = await apiClient.post<{ data: any }>(
-    '/organization/api/employee/appointments',
+    '/api/organization/employee/appointments',
     {
       provider_id: data.providerId,
       provider_type: data.providerType,
@@ -188,7 +189,7 @@ export async function rescheduleAppointment(
   }
 ): Promise<Appointment> {
   const response = await apiClient.put<{ data: any }>(
-    `/organization/api/employee/appointments/${id}/reschedule`,
+    `/api/organization/employee/appointments/${id}/reschedule`,
     {
       appointment_date: data.appointmentDate,
       appointment_time: data.appointmentTime,
@@ -221,7 +222,7 @@ export async function cancelAppointment(
   reason?: string
 ): Promise<{ message: string }> {
   const response = await apiClient.put<{ message: string }>(
-    `/organization/api/employee/appointments/${id}/cancel`,
+    `/api/organization/employee/appointments/${id}/cancel`,
     { reason }
   );
 
@@ -231,7 +232,7 @@ export async function cancelAppointment(
 // ─── Get Telehealth Link ────────────────────────────────────────────
 export async function getTelehealthLink(id: string): Promise<{ link: string }> {
   const response = await apiClient.get<{ data: { link: string } }>(
-    `/organization/api/employee/appointments/${id}/telehealth`
+    `/api/organization/employee/appointments/${id}/telehealth`
   );
 
   return { link: response.data.link };

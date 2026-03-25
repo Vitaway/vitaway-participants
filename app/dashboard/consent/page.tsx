@@ -3,7 +3,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Shield, CheckCircle, XCircle, History, AlertCircle } from 'lucide-react';
+import { Shield, CheckCircle, XCircle, History, AlertCircle, Loader2 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,6 @@ interface ConsentPreferences {
 }
 
 export default function ConsentPage() {
-  const [settings, setSettings] = useState<ConsentSetting[]>([]);
   const [preferences, setPreferences] = useState<ConsentPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -54,7 +53,6 @@ export default function ConsentPage() {
     async function loadData() {
       try {
         const settingsData = await getConsentSettings();
-        setSettings(settingsData);
         const prefs = convertToPreferences(settingsData);
         setPreferences(prefs);
         setTempPreferences(prefs);
@@ -102,7 +100,6 @@ export default function ConsentPage() {
 
       // Reload settings
       const settingsData = await getConsentSettings();
-      setSettings(settingsData);
       const prefs = convertToPreferences(settingsData);
       setPreferences(prefs);
       setTempPreferences(prefs);
@@ -123,7 +120,10 @@ export default function ConsentPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-slate-500">Loading consent preferences...</p>
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+            <p className="text-slate-500 dark:text-slate-400">Loading consent preferences...</p>
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -133,7 +133,7 @@ export default function ConsentPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-slate-500">Failed to load consent preferences</p>
+          <p className="text-slate-500 dark:text-slate-400">Failed to load consent preferences</p>
         </div>
       </DashboardLayout>
     );
@@ -145,7 +145,7 @@ export default function ConsentPage() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Privacy & Consent</h1>
-          <p className="mt-1 text-slate-600">
+          <p className="mt-1 text-slate-600 dark:text-slate-400">
             Control how your health data is shared and used
           </p>
         </div>
@@ -154,20 +154,20 @@ export default function ConsentPage() {
         <Card>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-green-100 p-3">
-                <Shield className="h-8 w-8 text-green-600" />
+              <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-3">
+                <Shield className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50">
                   Your Privacy is Protected
                 </h3>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-slate-600 dark:text-slate-400">
                   You have control over your health information
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm text-slate-600">Last Updated</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Last Updated</p>
               <p className="font-medium text-slate-800 dark:text-slate-50">
                 {formatDate(preferences.lastUpdated)}
               </p>
@@ -179,7 +179,7 @@ export default function ConsentPage() {
         <Card title="Data Sharing Preferences">
           <div className="space-y-6">
             {/* Employer Access */}
-            <div className="rounded-lg border border-slate-200 p-4">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
@@ -190,7 +190,7 @@ export default function ConsentPage() {
                       <XCircle className="h-5 w-5 text-red-600" />
                     )}
                   </div>
-                  <p className="mt-2 text-sm text-slate-600">
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                     Allow your employer to access your health data for wellness program
                     administration and compliance. Your employer will only see data you
                     explicitly consent to share.
@@ -210,13 +210,13 @@ export default function ConsentPage() {
                     onChange={() => handleToggle('allowEmployerAccess')}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                 </label>
               </div>
             </div>
 
             {/* Aggregated Data */}
-            <div className="rounded-lg border border-slate-200 p-4">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
@@ -227,7 +227,7 @@ export default function ConsentPage() {
                       <XCircle className="h-5 w-5 text-red-600" />
                     )}
                   </div>
-                  <p className="mt-2 text-sm text-slate-600">
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                     Allow your employer to view aggregated, anonymized data that cannot be
                     traced back to you individually. This helps improve wellness programs
                     for all employees.
@@ -247,13 +247,13 @@ export default function ConsentPage() {
                     onChange={() => handleToggle('allowAggregatedData')}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                 </label>
               </div>
             </div>
 
             {/* Individual Data */}
-            <div className="rounded-lg border border-slate-200 p-4">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
@@ -266,7 +266,7 @@ export default function ConsentPage() {
                       <XCircle className="h-5 w-5 text-red-600" />
                     )}
                   </div>
-                  <p className="mt-2 text-sm text-slate-600">
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                     Allow your employer to view your individual health metrics and
                     progress. This may be required for certain wellness incentive
                     programs.
@@ -286,7 +286,7 @@ export default function ConsentPage() {
                     onChange={() => handleToggle('allowIndividualData')}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                 </label>
               </div>
             </div>
@@ -294,7 +294,7 @@ export default function ConsentPage() {
 
           {/* Action Buttons */}
           {hasChanges && (
-            <div className="flex gap-2 mt-6 pt-6 border-t border-slate-200">
+            <div className="flex gap-2 mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
               <Button onClick={handleSave} disabled={saving} className="flex-1">
                 {saving ? 'Saving...' : 'Save Changes'}
               </Button>

@@ -1,4 +1,5 @@
 // Health Data API Service
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { apiClient } from './client';
 import type { VitalReading, HealthAssessment, VitalType } from '@/types';
@@ -13,7 +14,7 @@ export async function getVitals(params?: {
 }): Promise<{ data: VitalReading[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/employee/health/vitals',
+      '/api/organization/employee/health/vitals',
       {
         type: params?.type,
         from_date: params?.fromDate,
@@ -23,8 +24,9 @@ export async function getVitals(params?: {
       }
     );
 
+    const vitalsRaw: any[] = (response as any).data?.data ?? (Array.isArray((response as any).data) ? (response as any).data : []);
     return {
-      data: Array.isArray(response.data) ? response.data.map((vital: any) => ({
+      data: vitalsRaw.map((vital: any) => ({
         id: String(vital.id),
         employeeId: String(vital.employee_id),
         vitalType: vital.vital_type,
@@ -34,8 +36,8 @@ export async function getVitals(params?: {
         recordedBy: vital.recorded_by,
         notes: vital.notes,
         metadata: vital.metadata,
-      })) : [],
-      meta: response.meta || {},
+      })),
+      meta: (response as any).data?.meta ?? (response as any).meta ?? {},
     };
   } catch (error: any) {
     console.error('Failed to fetch vitals:', error);
@@ -54,7 +56,7 @@ export async function getAssessments(params?: {
 }): Promise<{ data: HealthAssessment[]; meta: any }> {
   try {
     const response = await apiClient.get<{ data: any[]; meta: any }>(
-      '/employee/health/assessments',
+      '/api/organization/employee/health/assessments',
       {
         type: params?.type,
         status: params?.status,
@@ -65,8 +67,9 @@ export async function getAssessments(params?: {
       }
     );
 
+    const assessmentsRaw: any[] = (response as any).data?.data ?? (Array.isArray((response as any).data) ? (response as any).data : []);
     return {
-      data: Array.isArray(response.data) ? response.data.map((assessment: any) => ({
+      data: assessmentsRaw.map((assessment: any) => ({
         id: String(assessment.id),
         employeeId: String(assessment.employee_id),
         assessmentType: assessment.assessment_type,
@@ -78,8 +81,8 @@ export async function getAssessments(params?: {
         results: assessment.results,
         recommendations: assessment.recommendations,
         createdAt: assessment.created_at,
-      })) : [],
-      meta: response.meta || {},
+      })),
+      meta: (response as any).data?.meta ?? (response as any).meta ?? {},
     };
   } catch (error: any) {
     console.error('Failed to fetch assessments:', error);
@@ -90,7 +93,7 @@ export async function getAssessments(params?: {
 // ─── Get Single Assessment ──────────────────────────────────────────
 export async function getAssessment(id: string): Promise<HealthAssessment> {
   const response = await apiClient.get<{ data: any }>(
-    `/employee/health/assessments/${id}`
+    `/api/organization/employee/health/assessments/${id}`
   );
 
   const assessment = response.data;

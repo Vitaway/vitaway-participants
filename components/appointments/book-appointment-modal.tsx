@@ -69,7 +69,7 @@ export function BookAppointmentModal({
     if (isOpen) {
       loadProviders();
     }
-  }, [isOpen, user?.organizationId, authLoading]);
+  }, [isOpen, user?.organizationId, authLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

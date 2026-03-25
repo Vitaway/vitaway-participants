@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Activity, TrendingUp, TrendingDown, Minus, Loader2 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +32,10 @@ export default function HealthOverview() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <p className="text-slate-500">Loading health data...</p>
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+            <p className="text-slate-500 dark:text-slate-400">Loading health data...</p>
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -82,7 +85,7 @@ export default function HealthOverview() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Health Overview</h1>
-          <p className="mt-1 text-slate-600">
+          <p className="mt-1 text-slate-600 dark:text-slate-400">
             View your vital signs and health trends over time
           </p>
         </div>
@@ -116,7 +119,7 @@ export default function HealthOverview() {
               <Card key={type}>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-slate-600">
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
                       {type.replace(/_/g, ' ')}
                     </p>
                     <Activity className="h-5 w-5 text-slate-400" />
@@ -130,9 +133,9 @@ export default function HealthOverview() {
                       </p>
                       {previousValue !== undefined && getTrendIcon(currentValue, previousValue)}
                     </div>
-                    <p className="text-xs text-slate-500">{latest.unit}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{latest.unit}</p>
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Last recorded: {formatDate(latest.recordedAt)}
                   </p>
                 </div>
@@ -149,17 +152,17 @@ export default function HealthOverview() {
                 {readings.map((reading) => (
                   <div
                     key={reading.id}
-                    className="flex items-center justify-between rounded-lg border border-slate-200 p-4"
+                    className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100">
-                        <Activity className="h-5 w-5 text-primary-600" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30">
+                        <Activity className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                       </div>
                       <div>
                         <p className="font-medium text-slate-800 dark:text-slate-50">
                           {formatVitalValue(reading)}
                         </p>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
                           {formatDate(reading.recordedAt)}
                         </p>
                       </div>
@@ -174,8 +177,8 @@ export default function HealthOverview() {
 
         {/* Health Note */}
         <Card>
-          <div className="rounded-lg bg-primary-50 p-4">
-            <p className="text-sm text-primary-900">
+          <div className="rounded-lg bg-primary-50 dark:bg-primary-900/20 p-4">
+            <p className="text-sm text-primary-900 dark:text-primary-200">
               <strong>Note:</strong> This data is for tracking purposes only and does not
               constitute medical advice. Please consult with your healthcare provider for
               medical interpretation and recommendations.
