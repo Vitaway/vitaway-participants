@@ -7,6 +7,7 @@ import type {
   Program,
   ProgramModule,
   ProgramQuiz,
+  ProgramStatus,
   ModuleProgress,
   QuizSubmissionResult,
 } from '@/types';
