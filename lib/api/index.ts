@@ -33,6 +33,7 @@ export {
   getVitals,
   getAssessments,
   getAssessment,
+  getPatientRecord,
 } from './health';
 
 // ─── Goals Services ─────────────────────────────────────────────────

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { apiClient } from './client';
-import type { VitalReading, HealthAssessment, VitalType } from '@/types';
+import type { VitalReading, HealthAssessment, VitalType, PatientRecord } from '@/types';
 
 // ─── Get Vitals ─────────────────────────────────────────────────────
 export async function getVitals(params?: {
@@ -110,4 +110,17 @@ export async function getAssessment(id: string): Promise<HealthAssessment> {
     recommendations: assessment.recommendations,
     createdAt: assessment.created_at,
   };
+}
+
+// ─── Get Patient Record (EHR Data) ─────────────────────────────────
+export async function getPatientRecord(): Promise<PatientRecord | null> {
+  try {
+    const response = await apiClient.get<{ success: boolean; data: PatientRecord }>(
+      '/api/organization/employee/health/patient-record'
+    );
+    return (response as any).data ?? null;
+  } catch (error: any) {
+    console.error('Failed to fetch patient record:', error);
+    return null;
+  }
 }

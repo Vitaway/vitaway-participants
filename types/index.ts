@@ -302,3 +302,150 @@ export interface DashboardOverview {
     programCompletionRate: number;
   };
 }
+
+// ─── EHR Patient Record (from clinic) ───────────────────────────────
+export interface PatientPersonalInfo {
+  name: string;
+  email: string | null;
+  gender: string | null;
+  date_of_birth: string | null;
+  marital_status: string | null;
+  contact_number: string | null;
+  address: string | null;
+  location: string | null;
+  national_id: string | null;
+  medical_record_number: string | null;
+  emergency_contact_name: string | null;
+}
+
+export interface PatientHealthRecord {
+  id: number;
+  blood_pressure: string | null;
+  blood_pressure_unit: string | null;
+  pulse_rate: string | null;
+  blood_sugar: string | null;
+  blood_sugar_unit: string | null;
+  head_circumference: string | null;
+  head_circumference_unit: string | null;
+  muac: string | null;
+  muac_unit: string | null;
+  haemoglobin: string | null;
+  haemoglobin_unit: string | null;
+  haemoglobin_a1c: string | null;
+  haemoglobin_a1c_unit: string | null;
+  waist_circumference: string | null;
+  waist_circumference_unit: string | null;
+  notes: string | null;
+  recorded_at: string;
+}
+
+export interface PatientMedicalHistory {
+  id: number;
+  past_illness: string | null;
+  surgeries: string | null;
+  medication: string | null;
+  medication_details: string | null;
+  allergies: string | null;
+  allergy_reactions: string | null;
+  family_history: string | null;
+  blood_type: string | null;
+  diagnoses: string[] | null;
+  goals: string[] | null;
+  height: number | null;
+  weight: number | null;
+  bmi: number | null;
+  smoke_frequency: string | null;
+  drink_frequency: string | null;
+  exercise_frequency: string | null;
+  last_physical_exam: string | null;
+  last_blood_work: string | null;
+  last_dental_exam: string | null;
+  health_concerns: string | null;
+  nutrition_goals: string | null;
+  additional_notes: string | null;
+}
+
+export interface PatientVisitRecord {
+  id: number;
+  visit_date: string | null;
+  visit_type: string | null;
+  height: string | null;
+  height_unit: string | null;
+  weight: string | null;
+  weight_unit: string | null;
+  bmi: string | null;
+  blood_pressure: string | null;
+  systolic_bp: string | null;
+  diastolic_bp: string | null;
+  heart_rate: string | null;
+  temperature: string | null;
+  blood_sugar: string | null;
+  haemoglobin: string | null;
+  haemoglobin_a1c: string | null;
+  body_fat_percentage: string | null;
+  muscle_fat_percentage: string | null;
+  visceral_fat_percentage: string | null;
+  metabolic_age: string | null;
+  muscle_mass: string | null;
+  bone_mass: string | null;
+  waist_circumference: string | null;
+  activity_level: string | null;
+  sleep_hours: string | null;
+  sleep_quality: string | null;
+  stress_level: string | null;
+  appetite_level: string | null;
+  assessment_summary: string | null;
+  intervention_plan: string | null;
+  primary_goal: string | null;
+  short_term_goals: string | null;
+  long_term_goals: string | null;
+}
+
+export interface PatientLifestyle {
+  diet: string | null;
+  physical_activity: string | null;
+  smoking: string | null;
+  alcohol_use: string | null;
+  sleep_patterns: string | null;
+  recreational_drugs_frequency: string | null;
+}
+
+export interface PatientPrescription {
+  id: number;
+  medication_name: string;
+  dosage: string | null;
+  frequency: string | null;
+  duration: string | null;
+}
+
+export interface PatientInsurance {
+  assurance_type: string | null;
+  assurance_number: string | null;
+}
+
+export interface PatientEmergencyContact {
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+}
+
+// ─── Medical Files ────────────────────────────────────────────────
+export interface PatientMedicalFile {
+  id: number;
+  title: string;
+  file_url: string;
+  description: string | null;
+  uploaded_at: string;
+}
+
+export interface PatientRecord {
+  personal_info: PatientPersonalInfo;
+  health_records: PatientHealthRecord[];
+  medical_history: PatientMedicalHistory | null;
+  recent_visits: PatientVisitRecord[];
+  lifestyle: PatientLifestyle | null;
+  prescriptions: PatientPrescription[];
+  insurance: PatientInsurance | null;
+  emergency_contact: PatientEmergencyContact | null;
+  medical_files: PatientMedicalFile[];
+}
