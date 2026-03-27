@@ -134,8 +134,14 @@ export default function ProgramsPage() {
       setSelectedEnrollment(prev => prev ? { ...prev, progressPercentage: res.completionPercentage } : null);
       setModuleProgress(res.progress);
       setView('detail');
-    } catch (e) {
-      if (e?.response?.status === 422 && e?.response?.data?.message?.includes('requires quiz but none found')) {
+    } catch (e: any) {
+      if (
+        typeof e === 'object' &&
+        e !== null &&
+        'response' in e &&
+        e.response?.status === 422 &&
+        e.response?.data?.message?.includes('requires quiz but none found')
+      ) {
         setError('This module is configured to require a quiz, but no quiz has been set up yet. Please contact your administrator.');
       } else {
         const message = e instanceof Error ? e.message : 'Failed to complete module';
@@ -160,11 +166,21 @@ export default function ProgramsPage() {
       setQuizAnswers({});
       setQuizResult(null);
       setView('quiz');
-    } catch (e) {
-      // Axios or fetch error shape
-      if (e?.response?.status === 422 && e?.response?.data?.message?.includes('requires quiz but none found')) {
+    } catch (e: any) {
+      if (
+        typeof e === 'object' &&
+        e !== null &&
+        'response' in e &&
+        e.response?.status === 422 &&
+        e.response?.data?.message?.includes('requires quiz but none found')
+      ) {
         setError('This module is configured to require a quiz, but no quiz has been set up yet. Please contact your administrator.');
-      } else if (e?.response?.status === 404 || (e?.response?.data?.message && e.response.data.message.includes('No quiz'))) {
+      } else if (
+        typeof e === 'object' &&
+        e !== null &&
+        'response' in e &&
+        (e.response?.status === 404 || (e.response?.data?.message && e.response.data.message.includes('No quiz')))
+      ) {
         setError('No quiz available for this module.');
       } else {
         const message = e instanceof Error ? e.message : 'Failed to load quiz';

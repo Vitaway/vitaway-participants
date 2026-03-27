@@ -52,14 +52,14 @@ export async function getModuleLessons(programId: string, moduleId: string): Pro
     `${BASE}/${programId}/modules/${moduleId}/lessons`
   );
   console.log('getModuleLessons response:', response);
-  console.log('getModuleLessons response.data:', response.data);
+  const resAny = response as any;
   let lessonsRaw: any[] = [];
   if (Array.isArray(response)) {
     lessonsRaw = response;
-  } else if (Array.isArray(response.data)) {
-    lessonsRaw = response.data;
-  } else if (Array.isArray(response.data?.data)) {
-    lessonsRaw = response.data.data;
+  } else if (Array.isArray(resAny.data)) {
+    lessonsRaw = resAny.data;
+  } else if (Array.isArray(resAny.data?.data)) {
+    lessonsRaw = resAny.data.data;
   }
   console.log('getModuleLessons lessonsRaw:', lessonsRaw);
   return lessonsRaw.map(mapLesson);
