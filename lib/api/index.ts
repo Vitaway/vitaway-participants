@@ -54,6 +54,7 @@ export {
   submitModuleQuiz,
   getFinalQuiz,
   submitFinalQuiz,
+  getModuleLessons,
 } from './programs';
 
 // ─── Appointments Services ──────────────────────────────────────────

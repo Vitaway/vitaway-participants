@@ -10,11 +10,26 @@ import type {
   ProgramStatus,
   ModuleProgress,
   QuizSubmissionResult,
+  ProgramLesson,
 } from '@/types';
 
 const BASE = '/api/organization/employee/programs';
 
 // ─── Helper: Map module from backend ─────────────────────────────────
+function mapLesson(l: any): ProgramLesson {
+  return {
+    id: String(l.id),
+    moduleId: String(l.module_id),
+    title: l.title,
+    description: l.description,
+    content: l.content,
+    contentType: l.content_type,
+    contentUrl: l.content_url || l.video_url || l.file_url || null,
+    durationMinutes: l.estimated_duration_minutes,
+    orderIndex: l.position,
+  };
+}
+
 function mapModule(m: any): ProgramModule {
   return {
     id: String(m.id),
@@ -28,7 +43,26 @@ function mapModule(m: any): ProgramModule {
     orderIndex: m.order_index,
     requiresQuizPass: m.requires_quiz_pass,
     quiz: m.quiz ? mapQuiz(m.quiz) : undefined,
+    lessons: m.lessons ? m.lessons.map(mapLesson) : [],
   };
+}
+// ─── Get Module Lessons ───────────────────────────────────────────
+export async function getModuleLessons(programId: string, moduleId: string): Promise<ProgramLesson[]> {
+  const response = await apiClient.get(
+    `${BASE}/${programId}/modules/${moduleId}/lessons`
+  );
+  console.log('getModuleLessons response:', response);
+  console.log('getModuleLessons response.data:', response.data);
+  let lessonsRaw: any[] = [];
+  if (Array.isArray(response)) {
+    lessonsRaw = response;
+  } else if (Array.isArray(response.data)) {
+    lessonsRaw = response.data;
+  } else if (Array.isArray(response.data?.data)) {
+    lessonsRaw = response.data.data;
+  }
+  console.log('getModuleLessons lessonsRaw:', lessonsRaw);
+  return lessonsRaw.map(mapLesson);
 }
 
 function mapQuiz(q: any): ProgramQuiz {

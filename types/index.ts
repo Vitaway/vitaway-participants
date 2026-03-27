@@ -122,6 +122,19 @@ export interface Program {
   quizzes?: ProgramQuiz[];
 }
 
+// ─── Program Lessons ─────────────────────────────────────────────
+export interface ProgramLesson {
+  id: string;
+  moduleId: string;
+  title: string;
+  description?: string;
+  content?: string;
+  contentType?: ContentType;
+  contentUrl?: string;
+  durationMinutes?: number;
+  orderIndex: number;
+}
+
 export interface ProgramModule {
   id: string;
   programId: string;
@@ -134,6 +147,7 @@ export interface ProgramModule {
   orderIndex: number;
   requiresQuizPass?: boolean;
   quiz?: ProgramQuiz;
+  lessons?: ProgramLesson[];
 }
 
 export interface ProgramQuiz {

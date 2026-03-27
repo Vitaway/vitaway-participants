@@ -9,23 +9,28 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
+
 import { Badge } from '@/components/ui/badge';
 import { ProgressBar } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import {
   getEnrolledPrograms, getProgram, startProgram,
   getModule, completeModule, getModuleQuiz, submitModuleQuiz,
-  getFinalQuiz, submitFinalQuiz,
+  getFinalQuiz, submitFinalQuiz, getModuleLessons,
 } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import type {
   ProgramEnrollment, Program, ProgramModule, ProgramQuiz,
-  ModuleProgress, QuizSubmissionResult,
+  ModuleProgress, QuizSubmissionResult, ProgramLesson,
 } from '@/types';
 
-type View = 'list' | 'detail' | 'module' | 'quiz' | 'quiz-result' | 'final-quiz' | 'final-result';
+
+type View = 'list' | 'detail' | 'module' | 'quiz' | 'quiz-result' | 'final-quiz' | 'final-result' | 'lesson';
 
 export default function ProgramsPage() {
+  // Lessons state (must be inside component)
+  const [moduleLessons, setModuleLessons] = useState<ProgramLesson[]>([]);
+  const [currentLesson, setCurrentLesson] = useState<ProgramLesson | null>(null);
   const [programs, setPrograms] = useState<ProgramEnrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -95,9 +100,15 @@ export default function ProgramsPage() {
     try {
       setActionLoading(true);
       setError(null);
+      // Debug: Log programId and moduleId
+      console.log('Fetching lessons for programId:', selectedEnrollment.programId, 'moduleId:', mod.id);
       const res = await getModule(selectedEnrollment.programId, mod.id);
       setCurrentModule(res.module);
       setCurrentModuleProgress(res.progress);
+      // Fetch lessons for this module
+      const lessons = await getModuleLessons(selectedEnrollment.programId, mod.id);
+      console.log('Lessons fetched:', lessons);
+      setModuleLessons(lessons);
       setView('module');
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Failed to load module';
@@ -105,6 +116,11 @@ export default function ProgramsPage() {
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const openLesson = (lesson: ProgramLesson) => {
+    setCurrentLesson(lesson);
+    setView('lesson');
   };
 
   const handleCompleteModule = async () => {
@@ -118,9 +134,13 @@ export default function ProgramsPage() {
       setSelectedEnrollment(prev => prev ? { ...prev, progressPercentage: res.completionPercentage } : null);
       setModuleProgress(res.progress);
       setView('detail');
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Failed to complete module';
-      setError(message);
+    } catch (e) {
+      if (e?.response?.status === 422 && e?.response?.data?.message?.includes('requires quiz but none found')) {
+        setError('This module is configured to require a quiz, but no quiz has been set up yet. Please contact your administrator.');
+      } else {
+        const message = e instanceof Error ? e.message : 'Failed to complete module';
+        setError(message);
+      }
     } finally {
       setActionLoading(false);
     }
@@ -132,13 +152,24 @@ export default function ProgramsPage() {
       setActionLoading(true);
       setError(null);
       const res = await getModuleQuiz(selectedEnrollment.programId, currentModule.id);
+      if (!res.quiz) {
+        setError('No quiz available for this module.');
+        return;
+      }
       setCurrentQuiz(res.quiz);
       setQuizAnswers({});
       setQuizResult(null);
       setView('quiz');
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Failed to load quiz';
-      setError(message);
+    } catch (e) {
+      // Axios or fetch error shape
+      if (e?.response?.status === 422 && e?.response?.data?.message?.includes('requires quiz but none found')) {
+        setError('This module is configured to require a quiz, but no quiz has been set up yet. Please contact your administrator.');
+      } else if (e?.response?.status === 404 || (e?.response?.data?.message && e.response.data.message.includes('No quiz'))) {
+        setError('No quiz available for this module.');
+      } else {
+        const message = e instanceof Error ? e.message : 'Failed to load quiz';
+        setError(message);
+      }
     } finally {
       setActionLoading(false);
     }
@@ -208,7 +239,8 @@ export default function ProgramsPage() {
   };
 
   const goBack = () => {
-    if (view === 'module' || view === 'quiz-result') setView('detail');
+    if (view === 'lesson') setView('module');
+    else if (view === 'module' || view === 'quiz-result') setView('detail');
     else if (view === 'quiz') setView('module');
     else if (view === 'final-quiz' || view === 'final-result') setView('detail');
     else { setView('list'); setSelectedProgram(null); setSelectedEnrollment(null); }
@@ -341,7 +373,7 @@ export default function ProgramsPage() {
   if (view === 'module' && currentModule) {
     const progress = currentModuleProgress;
     const isCompleted = progress?.moduleStatus === 'completed';
-    const hasQuiz = !!currentModule.requiresQuizPass || !!currentModule.quiz;
+    const hasQuiz = !!currentModule.quiz;
     const quizPassed = progress?.quizPassed;
 
     return (
@@ -359,6 +391,33 @@ export default function ProgramsPage() {
             )}
           </div>
           {error && <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-sm text-red-600 dark:text-red-400">{error}</div>}
+         
+          {moduleLessons.length > 0 && (
+            <Card>
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-2">Lessons</h3>
+                <div className="space-y-2">
+                  {moduleLessons.sort((a, b) => a.orderIndex - b.orderIndex).map(lesson => (
+                    <div
+                      key={lesson.id}
+                      className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer transition-all"
+                      onClick={() => openLesson(lesson)}
+                    >
+                      <BookOpen className="h-5 w-5 text-primary-500 dark:text-primary-400" />
+                      <div className="flex-1 min-w-0">
+                        <span className="font-medium text-slate-800 dark:text-slate-100 truncate">{lesson.title}</span>
+                        {lesson.durationMinutes && (
+                          <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">{lesson.durationMinutes} min</span>
+                        )}
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          )}
+          {/* Module Content */}
           <Card>
             <div className="prose dark:prose-invert max-w-none">
               {currentModule.content ? (
@@ -377,6 +436,9 @@ export default function ProgramsPage() {
                 Take Quiz
               </Button>
             )}
+            {!hasQuiz && (
+              <span className="text-xs text-slate-500 dark:text-slate-400">No quiz available for this module.</span>
+            )}
             {hasQuiz && quizPassed && (
               <Badge variant="success">Quiz Passed ({progress?.quizScore}%)</Badge>
             )}
@@ -388,6 +450,38 @@ export default function ProgramsPage() {
             )}
             {isCompleted && <Badge variant="success">Completed</Badge>}
           </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // ─── Lesson Content View ─────────────────────────────────────────
+  if (view === 'lesson' && currentLesson) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <button onClick={goBack} className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400">
+            <ArrowLeft className="h-4 w-4" /> Back to Module
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{currentLesson.title}</h1>
+            {currentLesson.durationMinutes && (
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <Clock className="h-4 w-4" /> {currentLesson.durationMinutes} min
+              </p>
+            )}
+          </div>
+          <Card>
+            <div className="prose dark:prose-invert max-w-none">
+              {currentLesson.content ? (
+                <div dangerouslySetInnerHTML={{ __html: currentLesson.content }} />
+              ) : currentLesson.description ? (
+                <p className="text-slate-700 dark:text-slate-300">{currentLesson.description}</p>
+              ) : (
+                <p className="text-slate-500 dark:text-slate-400">No content available for this lesson.</p>
+              )}
+            </div>
+          </Card>
         </div>
       </DashboardLayout>
     );
