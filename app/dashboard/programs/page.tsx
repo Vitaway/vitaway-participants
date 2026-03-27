@@ -311,11 +311,10 @@ export default function ProgramsPage() {
                     {question.answers.map(answer => (
                       <label
                         key={answer.id}
-                        className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-all ${
-                          quizAnswers[question.id] === Number(answer.id)
+                        className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-all ${quizAnswers[question.id] === Number(answer.id)
                             ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-400'
                             : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                        }`}
+                          }`}
                       >
                         <input
                           type="radio"
@@ -407,7 +406,7 @@ export default function ProgramsPage() {
             )}
           </div>
           {error && <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-sm text-red-600 dark:text-red-400">{error}</div>}
-         
+
           {moduleLessons.length > 0 && (
             <Card>
               <div className="space-y-2">
@@ -566,21 +565,19 @@ export default function ProgramsPage() {
                   <div
                     key={mod.id}
                     onClick={() => !isNotStarted && openModule(mod)}
-                    className={`flex items-center gap-4 rounded-lg border p-4 transition-all ${
-                      isModComplete
+                    className={`flex items-center gap-4 rounded-lg border p-4 transition-all ${isModComplete
                         ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20'
                         : isNotStarted
                           ? 'border-slate-200 dark:border-slate-700 opacity-60'
                           : 'border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer'
-                    }`}
+                      }`}
                   >
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                      isModComplete
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${isModComplete
                         ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400'
                         : status === 'in_progress'
                           ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                    }`}>
+                      }`}>
                       {isModComplete ? <CheckCircle className="h-5 w-5" /> : idx + 1}
                     </div>
                     <div className="flex-1 min-w-0">
