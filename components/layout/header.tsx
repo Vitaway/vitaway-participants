@@ -70,10 +70,10 @@ export default function Header() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-6 shadow-sm">
+    <header className="flex h-16 items-center justify-between border-b border-[#15365a] dark:border-slate-800 bg-[#1c4670] dark:bg-slate-950 px-6 shadow-sm">
       <div>
-        <h2 className="text-sm text-slate-500 dark:text-slate-400">Welcome back,</h2>
-        <h1 className="text-xl font-semibold text-slate-800 dark:text-slate-50">
+        <h2 className="text-sm text-white/60">Welcome back,</h2>
+        <h1 className="text-xl font-semibold text-white">
           {employee ? `${employee.firstName} ${employee.lastName}` : 'Loading...'}
         </h1>
       </div>
@@ -82,7 +82,7 @@ export default function Header() {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="rounded-full p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300"
+          className="rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white"
           title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
         >
           {theme === 'light' ? (
@@ -96,9 +96,9 @@ export default function Header() {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+            className="relative rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
           >
-            <Bell className="h-6 w-6" />
+            <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
                 {unreadCount}
@@ -176,14 +176,14 @@ export default function Header() {
         {/* Employee Info */}
         {employee && (
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white font-medium shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white font-medium shadow-sm">
               {getInitials(employee.firstName, employee.lastName)}
             </div>
             <div className="hidden md:block">
-              <p className="text-sm font-medium text-slate-800 dark:text-slate-50">
+              <p className="text-sm font-medium text-white">
                 {employee.firstName} {employee.lastName}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">{employee.organizationName}</p>
+              <p className="text-xs text-white/60">{employee.organizationName}</p>
             </div>
           </div>
         )}
@@ -191,7 +191,7 @@ export default function Header() {
         {/* Logout */}
         <button
           onClick={logout}
-          className="rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+          className="rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
           title="Logout"
         >
           <LogOut className="h-5 w-5" />

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:is(.dark *));
+
 :root {
   --color-background: 248 250 252; /* slate-50 */
   --color-background-secondary: 241 245 249; /* slate-100 */

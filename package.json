@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node scripts/seed.mjs all",
+    "seed:account": "node scripts/seed.mjs account",
+    "seed:consent": "node scripts/seed.mjs consent"
   },
   "dependencies": {
     "clsx": "^2.1.1",
