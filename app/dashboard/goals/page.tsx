@@ -4,13 +4,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Target, TrendingUp, Award, Calendar, X, Loader2, ChevronRight } from 'lucide-react';
+import { Target, TrendingUp, Award, Calendar, X, Loader2, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ProgressBar } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { getGoals, getGoal, updateGoalProgress } from '@/lib/api';
+import { getGoals, getGoal, updateGoalProgress, createGoal, deleteGoal } from '@/lib/api';
 import { formatDate, getProgressPercentage } from '@/lib/utils';
 import type { Goal, GoalProgress } from '@/types';
 
@@ -29,6 +29,22 @@ export default function GoalsPage() {
   const [detailGoal, setDetailGoal] = useState<Goal | null>(null);
   const [progressHistory, setProgressHistory] = useState<GoalProgress[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
+
+  // Create goal modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newGoal, setNewGoal] = useState({
+    title: '',
+    description: '',
+    goal_type: 'EXERCISE',
+    target_value: '',
+    unit: '',
+    start_date: new Date().toISOString().split('T')[0],
+    target_date: '',
+  });
+
+  // Delete confirm state
+  const [deletingGoalId, setDeletingGoalId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -87,8 +103,7 @@ export default function GoalsPage() {
     setDetailLoading(true);
     try {
       const res = await getGoal(goal.id);
-      setDetailGoal(res.goal);
-      setProgressHistory(res.progressHistory);
+      setDetailGoal(res.goal);      setProgressHistory(res.progressHistory);
     } catch (error) {
       console.error('Failed to load goal details:', error);
     } finally {
@@ -101,6 +116,40 @@ export default function GoalsPage() {
     if (f === 'ACTIVE') return 'active';
     if (f === 'COMPLETED') return 'completed';
     return undefined;
+  };
+
+  const handleCreateGoal = async () => {
+    if (!newGoal.title || !newGoal.target_value || !newGoal.target_date) return;
+    try {
+      setCreating(true);
+      await createGoal({
+        title: newGoal.title,
+        description: newGoal.description || undefined,
+        goal_type: newGoal.goal_type,
+        target_value: parseFloat(newGoal.target_value),
+        unit: newGoal.unit || undefined,
+        start_date: newGoal.start_date,
+        target_date: newGoal.target_date,
+      });
+      const fresh = await getGoals();
+      setGoals(fresh.data);
+      setShowCreateModal(false);
+      setNewGoal({ title: '', description: '', goal_type: 'EXERCISE', target_value: '', unit: '', start_date: new Date().toISOString().split('T')[0], target_date: '' });
+    } catch (error) {
+      console.error('Failed to create goal:', error);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDeleteGoal = async (id: string) => {
+    try {
+      await deleteGoal(id);
+      setGoals(prev => prev.filter(g => g.id !== id));
+      setDeletingGoalId(null);
+    } catch (error) {
+      console.error('Failed to delete goal:', error);
+    }
   };
 
   const filteredGoals = goals.filter((goal) => {
@@ -127,9 +176,11 @@ export default function GoalsPage() {
       EXERCISE: 'bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-400',
       NUTRITION: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400',
       MEDICATION: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400',
+      WEIGHT_MANAGEMENT: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400',
+      SLEEP: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400',
       OTHER: 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300',
     };
-    return colors[category] || colors.OTHER;
+    return colors[category?.toUpperCase()] || colors.OTHER;
   };
 
   const getCategoryIcon = (category: string) => {
@@ -147,11 +198,20 @@ export default function GoalsPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Goals & Progress</h1>
-          <p className="mt-1 text-slate-600 dark:text-slate-400">
-            Track your health goals and celebrate your achievements
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-50">Goals & Progress</h1>
+            <p className="mt-1 text-slate-600 dark:text-slate-400">
+              Track your health goals and celebrate your achievements
+            </p>
+          </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            New Goal
+          </button>
         </div>
 
         {/* Summary Stats */}
@@ -291,15 +351,27 @@ export default function GoalsPage() {
                         >
                           Details <ChevronRight className="h-4 w-4" />
                         </button>
+                        <button
+                          onClick={() => setDeletingGoalId(goal.id)}
+                          className="rounded-lg border border-red-200 dark:border-red-800 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     )}
                     {isCompleted && (
                       <div className="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
                         <button
                           onClick={() => openDetails(goal)}
-                          className="flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                          className="flex-1 flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                         >
                           View History <ChevronRight className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeletingGoalId(goal.id)}
+                          className="rounded-lg border border-red-200 dark:border-red-800 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     )}
@@ -309,22 +381,6 @@ export default function GoalsPage() {
             })
           )}
         </div>
-
-        {/* Motivation Card */}
-        <Card>
-          <div className="rounded-lg bg-linear-to-r from-blue-500 to-purple-600 p-6 text-white">
-            <div className="flex items-center gap-4">
-              <Award className="h-12 w-12" />
-              <div>
-                <h3 className="text-lg font-semibold">Keep Going!</h3>
-                <p className="mt-1 text-sm text-primary-100">
-                  You're making great progress on your health journey. Stay consistent
-                  and you'll reach your goals!
-                </p>
-              </div>
-            </div>
-          </div>
-        </Card>
       </div>
 
       {/* Update Progress Modal */}
@@ -419,6 +475,132 @@ export default function GoalsPage() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Create Goal Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-xl bg-white dark:bg-slate-800 p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">New Goal</h3>
+              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Title *</label>
+                <input
+                  type="text"
+                  value={newGoal.title}
+                  onChange={e => setNewGoal(v => ({ ...v, title: e.target.value }))}
+                  placeholder="e.g. Walk 10,000 steps daily"
+                  className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-100"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category *</label>
+                <select
+                  value={newGoal.goal_type}
+                  onChange={e => setNewGoal(v => ({ ...v, goal_type: e.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-100"
+                >
+                  <option value="EXERCISE">Exercise</option>
+                  <option value="NUTRITION">Nutrition</option>
+                  <option value="WEIGHT_MANAGEMENT">Weight Management</option>
+                  <option value="SLEEP">Sleep</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Target Value *</label>
+                  <input
+                    type="number"
+                    value={newGoal.target_value}
+                    onChange={e => setNewGoal(v => ({ ...v, target_value: e.target.value }))}
+                    min={0.01}
+                    step="any"
+                    placeholder="e.g. 10000"
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Unit</label>
+                  <input
+                    type="text"
+                    value={newGoal.unit}
+                    onChange={e => setNewGoal(v => ({ ...v, unit: e.target.value }))}
+                    placeholder="e.g. steps, kg, min"
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Start Date *</label>
+                  <input
+                    type="date"
+                    value={newGoal.start_date}
+                    onChange={e => setNewGoal(v => ({ ...v, start_date: e.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Target Date *</label>
+                  <input
+                    type="date"
+                    value={newGoal.target_date}
+                    onChange={e => setNewGoal(v => ({ ...v, target_date: e.target.value }))}
+                    min={newGoal.start_date}
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Description</label>
+                <textarea
+                  value={newGoal.description}
+                  onChange={e => setNewGoal(v => ({ ...v, description: e.target.value }))}
+                  rows={2}
+                  placeholder="Describe your goal (optional)"
+                  className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-100"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setShowCreateModal(false)}>Cancel</Button>
+                <Button
+                  onClick={handleCreateGoal}
+                  disabled={creating || !newGoal.title || !newGoal.target_value || !newGoal.target_date}
+                >
+                  {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Create Goal
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingGoalId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-sm rounded-xl bg-white dark:bg-slate-800 p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Delete Goal?</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
+              This will permanently remove the goal and all its progress history.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setDeletingGoalId(null)}>Cancel</Button>
+              <button
+                onClick={() => handleDeleteGoal(deletingGoalId)}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

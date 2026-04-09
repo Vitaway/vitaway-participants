@@ -29,7 +29,7 @@ export async function getGoals(params?: {
       employeeId: String(goal.employee_id),
       title: goal.title,
       description: goal.description,
-      category: goal.category,
+      category: goal.goal_type,
       targetValue: goal.target_value,
       currentValue: goal.current_value,
       unit: goal.unit,
@@ -66,7 +66,7 @@ export async function getGoal(id: string): Promise<{
       employeeId: String(data.employee_id),
       title: data.title,
       description: data.description,
-      category: data.category,
+      category: data.goal_type,
       targetValue: data.target_value,
       currentValue: data.current_value,
       unit: data.unit,
@@ -115,4 +115,44 @@ export async function updateGoalProgress(
     recordedAt: progress.recorded_at,
     recordedBy: String(progress.recorded_by),
   };
+}
+
+// ─── Create Goal ────────────────────────────────────────────────────
+export async function createGoal(data: {
+  title: string;
+  description?: string;
+  goal_type: string;
+  target_value: number;
+  unit?: string;
+  start_date: string;
+  target_date: string;
+}): Promise<Goal> {
+  const response = await apiClient.post<{ data: any }>(
+    '/api/organization/employee/goals',
+    data
+  );
+
+  const goal = (response as any).data;
+  return {
+    id: String(goal.id),
+    employeeId: String(goal.employee_id),
+    title: goal.title,
+    description: goal.description,
+    category: goal.goal_type,
+    targetValue: goal.target_value,
+    currentValue: goal.current_value,
+    unit: goal.unit,
+    startDate: goal.start_date,
+    targetDate: goal.target_date,
+    status: goal.status,
+    assignedBy: goal.assigned_by ? String(goal.assigned_by) : undefined,
+    progressPercentage: goal.progress_percentage || 0,
+    createdAt: goal.created_at,
+    updatedAt: goal.updated_at,
+  };
+}
+
+// ─── Delete Goal ────────────────────────────────────────────────────
+export async function deleteGoal(id: string): Promise<void> {
+  await apiClient.delete(`/api/organization/employee/goals/${id}`);
 }

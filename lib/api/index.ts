@@ -40,8 +40,8 @@ export {
 export {
   getGoals,
   getGoal,
-  updateGoalProgress,
-} from './goals';
+  updateGoalProgress,  createGoal,
+  deleteGoal,} from './goals';
 
 // ─── Programs Services ──────────────────────────────────────────────
 export {
