@@ -305,39 +305,6 @@ export default function ConsentPage() {
           )}
         </Card>
 
-        {/* Important Information */}
-        <Card>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 rounded-lg bg-primary-50 p-4">
-              <AlertCircle className="h-5 w-5 text-primary-600 mt-0.5" />
-              <div className="flex-1">
-                <h4 className="font-medium text-primary-900">How Your Data is Protected</h4>
-                <ul className="mt-2 space-y-1 text-sm text-primary-800">
-                  <li>• All data is encrypted in transit and at rest</li>
-                  <li>• Access is logged and audited for compliance</li>
-                  <li>• You can revoke consent at any time</li>
-                  <li>• Your employer cannot access medical diagnoses or treatment details</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 rounded-lg bg-yellow-50 p-4">
-              <History className="h-5 w-5 text-yellow-600 mt-0.5" />
-              <div className="flex-1">
-                <h4 className="font-medium text-yellow-900">Consent Version</h4>
-                <p className="mt-1 text-sm text-yellow-800">
-                  Current version: {preferences.version} | Last updated:{' '}
-                  {formatDate(preferences.lastUpdated)}
-                </p>
-                <p className="mt-2 text-sm text-yellow-800">
-                  You will be notified if consent terms are updated and will need to
-                  review and accept the new terms.
-                </p>
-              </div>
-            </div>
-          </div>
-        </Card>
-
         {/* Legal */}
         <Card title="Legal Documents">
           <div className="space-y-2">

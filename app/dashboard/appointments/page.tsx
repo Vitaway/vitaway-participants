@@ -256,13 +256,6 @@ export default function AppointmentsPage() {
                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                   Book an appointment to get started
                 </p>
-                <Button
-                  onClick={() => setShowBookModal(true)}
-                  className="mt-4 flex items-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Book Appointment
-                </Button>
               </div>
             </Card>
           ) : (

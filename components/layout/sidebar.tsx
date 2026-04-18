@@ -34,7 +34,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex w-64 flex-col bg-[#1c4670] dark:bg-slate-950 border-r border-[#15365a] dark:border-slate-800 shadow-sm">
+    <div className="flex w-64 flex-col bg-[#1c4670] dark:bg-slate-950 border-r border-[#15365a] dark:border-slate-800">
       {/* Logo */}
       <div className="flex h-16 items-center px-6 border-b border-[#15365a] dark:border-slate-800">
         <h1 className="text-2xl font-bold text-white">Vitaway</h1>
