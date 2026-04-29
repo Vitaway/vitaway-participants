@@ -83,7 +83,7 @@ export default function MealPlansPage() {
                                     key={plan.id}
                                     href={`/dashboard/meal-plans/${plan.id}`}
                                 >
-                                    <Card className="p-5 hover:shadow-md transition-shadow cursor-pointer">
+                                    <Card className="p-5 border border-gray-200 transition-shadow cursor-pointer">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-start gap-4 flex-1 min-w-0">
                                                 <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center">

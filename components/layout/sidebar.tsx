@@ -25,9 +25,7 @@ const navigation = [
   { name: 'Programs', href: ROUTES.PROGRAMS, icon: BookOpen },
   { name: 'Meal Plans', href: ROUTES.MEAL_PLANS, icon: UtensilsCrossed },
   { name: 'Appointments', href: ROUTES.APPOINTMENTS, icon: Calendar },
-  { name: 'Notifications', href: ROUTES.NOTIFICATIONS, icon: Bell },
   { name: 'Profile', href: ROUTES.PROFILE, icon: User },
-  { name: 'Privacy & Consent', href: ROUTES.CONSENT, icon: Shield },
 ];
 
 export default function Sidebar() {
