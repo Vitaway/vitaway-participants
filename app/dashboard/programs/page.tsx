@@ -5,7 +5,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   BookOpen, CheckCircle, Clock, PlayCircle, ArrowLeft,
-  FileText, Award, AlertCircle, ChevronRight, Loader2,
+  FileText, Award, AlertCircle, ChevronRight, Loader2, Video, File,
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
@@ -265,6 +265,22 @@ export default function ProgramsPage() {
   const getModuleProgressForId = (moduleId: string) =>
     moduleProgress.find(p => p.moduleId === moduleId);
 
+  // Helper function to get icon for lesson content type
+  const getLessonIcon = (contentType?: string) => {
+    switch (contentType) {
+      case 'video':
+        return <Video className="h-5 w-5 text-blue-500 dark:text-blue-400" />;
+      case 'file':
+        return <File className="h-5 w-5 text-orange-500 dark:text-orange-400" />;
+      case 'text':
+        return <BookOpen className="h-5 w-5 text-green-500 dark:text-green-400" />;
+      case 'mixed':
+        return <FileText className="h-5 w-5 text-purple-500 dark:text-purple-400" />;
+      default:
+        return <BookOpen className="h-5 w-5 text-primary-500 dark:text-primary-400" />;
+    }
+  };
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -418,14 +434,23 @@ export default function ProgramsPage() {
                       className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer transition-all"
                       onClick={() => openLesson(lesson)}
                     >
-                      <BookOpen className="h-5 w-5 text-primary-500 dark:text-primary-400" />
+                      {getLessonIcon(lesson.contentType)}
                       <div className="flex-1 min-w-0">
-                        <span className="font-medium text-slate-800 dark:text-slate-100 truncate">{lesson.title}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-slate-800 dark:text-slate-100 truncate">{lesson.title}</span>
+                          {lesson.contentType && (
+                            <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded capitalize whitespace-nowrap">
+                              {lesson.contentType}
+                            </span>
+                          )}
+                        </div>
                         {lesson.durationMinutes && (
-                          <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">{lesson.durationMinutes} min</span>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            <Clock className="h-3 w-3 inline mr-1" />{lesson.durationMinutes} min
+                          </p>
                         )}
                       </div>
-                      <ChevronRight className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                      <ChevronRight className="h-4 w-4 text-slate-400 dark:text-slate-500 shrink-0" />
                     </div>
                   ))}
                 </div>
@@ -472,6 +497,10 @@ export default function ProgramsPage() {
 
   // ─── Lesson Content View ─────────────────────────────────────────
   if (view === 'lesson' && currentLesson) {
+    const isVideoUrl = (url: string) => /\.(mp4|webm|ogg|mov)$/i.test(url) || url.includes('youtube') || url.includes('vimeo');
+    const isPdfUrl = (url: string) => /\.pdf$/i.test(url);
+    const isImageUrl = (url: string) => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+
     return (
       <DashboardLayout>
         <div className="space-y-6">
@@ -479,24 +508,124 @@ export default function ProgramsPage() {
             <ArrowLeft className="h-4 w-4" /> Back to Module
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{currentLesson.title}</h1>
-            {currentLesson.durationMinutes && (
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                <Clock className="h-4 w-4" /> {currentLesson.durationMinutes} min
-              </p>
-            )}
-          </div>
-          <Card>
-            <div className="prose dark:prose-invert max-w-none">
-              {currentLesson.content ? (
-                <div dangerouslySetInnerHTML={{ __html: currentLesson.content }} />
-              ) : currentLesson.description ? (
-                <p className="text-slate-700 dark:text-slate-300">{currentLesson.description}</p>
-              ) : (
-                <p className="text-slate-500 dark:text-slate-400">No content available for this lesson.</p>
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{currentLesson.title}</h1>
+                {currentLesson.contentType && (
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                    {getLessonIcon(currentLesson.contentType)}
+                    <span className="capitalize">{currentLesson.contentType} Content</span>
+                  </p>
+                )}
+              </div>
+              {currentLesson.durationMinutes && (
+                <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1 whitespace-nowrap">
+                  <Clock className="h-4 w-4" /> {currentLesson.durationMinutes} min
+                </p>
               )}
             </div>
-          </Card>
+          </div>
+
+          {/* Render content based on type */}
+          {/* Video Content */}
+          {(currentLesson.contentType === 'video' || currentLesson.videoUrl) && currentLesson.videoUrl && (
+            <Card>
+              {isVideoUrl(currentLesson.videoUrl) && (
+                <div className="relative w-full bg-black rounded-lg overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+                  {currentLesson.videoUrl.includes('youtube.com') || currentLesson.videoUrl.includes('youtu.be') ? (
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={currentLesson.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                      title={currentLesson.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : currentLesson.videoUrl.includes('vimeo.com') ? (
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={currentLesson.videoUrl}
+                      title={currentLesson.title}
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      className="absolute inset-0 w-full h-full"
+                      controls
+                      src={currentLesson.videoUrl}
+                      title={currentLesson.title}
+                    />
+                  )}
+                </div>
+              )}
+            </Card>
+          )}
+
+          {/* File Content */}
+          {(currentLesson.contentType === 'file' || currentLesson.fileUrl) && currentLesson.fileUrl && (
+            <Card>
+              {isPdfUrl(currentLesson.fileUrl) ? (
+                <div className="flex flex-col gap-4">
+                  <iframe
+                    className="w-full h-96 rounded-lg border border-slate-200 dark:border-slate-700"
+                    src={currentLesson.fileUrl}
+                    title={currentLesson.title}
+                  />
+                  <a
+                    href={currentLesson.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 flex items-center gap-1"
+                  >
+                    <FileText className="h-4 w-4" /> Download PDF
+                  </a>
+                </div>
+              ) : isImageUrl(currentLesson.fileUrl) ? (
+                <img
+                  src={currentLesson.fileUrl}
+                  alt={currentLesson.title}
+                  className="w-full h-auto rounded-lg"
+                />
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <p className="text-slate-600 dark:text-slate-400">
+                    File: <span className="font-mono text-sm">{currentLesson.fileUrl.split('/').pop()}</span>
+                  </p>
+                  <a
+                    href={currentLesson.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
+                  >
+                    <File className="h-4 w-4" /> Download File
+                  </a>
+                </div>
+              )}
+            </Card>
+          )}
+
+          {/* Text/HTML Content */}
+          {currentLesson.content && (
+            <Card>
+              <div className="prose dark:prose-invert max-w-none">
+                <div dangerouslySetInnerHTML={{ __html: currentLesson.content }} />
+              </div>
+            </Card>
+          )}
+
+          {/* Description if no content */}
+          {!currentLesson.content && currentLesson.description && (
+            <Card>
+              <p className="text-slate-700 dark:text-slate-300">{currentLesson.description}</p>
+            </Card>
+          )}
+
+          {/* No content message */}
+          {!currentLesson.content && !currentLesson.description && !currentLesson.videoUrl && !currentLesson.fileUrl && (
+            <Card>
+              <p className="text-slate-500 dark:text-slate-400">No content available for this lesson.</p>
+            </Card>
+          )}
         </div>
       </DashboardLayout>
     );

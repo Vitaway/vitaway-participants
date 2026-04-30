@@ -131,6 +131,9 @@ export interface ProgramLesson {
   content?: string;
   contentType?: ContentType;
   contentUrl?: string;
+  videoUrl?: string;
+  fileUrl?: string;
+  fileType?: string;
   durationMinutes?: number;
   orderIndex: number;
 }
@@ -143,6 +146,9 @@ export interface ProgramModule {
   content?: string;
   contentType?: ContentType;
   contentUrl?: string;
+  videoUrl?: string;
+  fileUrl?: string;
+  fileType?: string;
   durationMinutes?: number;
   orderIndex: number;
   requiresQuizPass?: boolean;
