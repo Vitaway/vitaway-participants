@@ -106,7 +106,7 @@ export interface GoalProgress {
 
 // ─── Programs & Learning ────────────────────────────────────────────
 export type ProgramStatus = 'not_started' | 'in_progress' | 'completed' | 'paused' | 'not_enrolled' | 'enrolled';
-export type ContentType = 'video' | 'article' | 'quiz' | 'exercise' | 'document';
+export type ContentType = 'video' | 'article' | 'quiz' | 'exercise' | 'document' | 'file' | 'text' | 'image' | 'mixed';
 export type ModuleStatus = 'not_started' | 'in_progress' | 'completed';
 
 export interface Program {
