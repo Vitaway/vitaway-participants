@@ -94,9 +94,7 @@ export function VideoPlayer({
           </div>
           <Button
             variant="outline"
-            size="sm"
-            asChild
-          >
+            size="sm"          >
             <a href={videoUrl} target="_blank" rel="noopener noreferrer">
               <Download className="h-4 w-4 mr-2" />
               Open in new tab

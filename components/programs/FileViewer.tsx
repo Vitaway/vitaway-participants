@@ -106,10 +106,10 @@ export function FileViewer({
                 {displayName}
               </h3>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline" className="text-xs uppercase">
+                <Badge variant="default" className="text-xs uppercase">
                   {ext}
                 </Badge>
-                <Badge variant="secondary" className="text-xs capitalize">
+                <Badge variant="info" className="text-xs capitalize">
                   {fileKind}
                 </Badge>
               </div>
@@ -117,7 +117,7 @@ export function FileViewer({
           </div>
           <div className="flex gap-2 flex-shrink-0">
             {previewable && (
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm">
                 <a
                   href={fileUrl}
                   target="_blank"
@@ -128,7 +128,7 @@ export function FileViewer({
                 </a>
               </Button>
             )}
-            <Button variant="default" size="sm" asChild>
+            <Button size="sm">
               <a
                 href={fileUrl}
                 download={displayName}
