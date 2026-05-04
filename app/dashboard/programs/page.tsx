@@ -6,6 +6,8 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   BookOpen, CheckCircle, Clock, PlayCircle, ArrowLeft,
   FileText, Award, AlertCircle, ChevronRight, Loader2, Video, File,
+  FileTextIcon,
+  FolderOpen,
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
@@ -71,6 +73,7 @@ export default function ProgramsPage() {
       setError(null);
       const res = await getProgram(enrollment.programId);
       setSelectedProgram(res.program);
+      console.log("Fetched ", res.program);
       setSelectedEnrollment({ ...enrollment, progressPercentage: res.completionPercentage });
       setModuleProgress(res.progress);
       setView('detail');
@@ -328,8 +331,8 @@ export default function ProgramsPage() {
                       <label
                         key={answer.id}
                         className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-all ${quizAnswers[question.id] === Number(answer.id)
-                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-400'
-                            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-400'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                           }`}
                       >
                         <input
@@ -423,26 +426,40 @@ export default function ProgramsPage() {
           </div>
           {error && <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-sm text-red-600 dark:text-red-400">{error}</div>}
 
+          {/* Module Content */}
+          <Card>
+            <div className="prose dark:prose-invert max-w-none">
+              {currentModule.content ? (
+                <div dangerouslySetInnerHTML={{ __html: currentModule.content }} />
+              ) : currentModule.description ? (
+                <p className="text-slate-700 dark:text-slate-300">{currentModule.description}</p>
+              ) : (
+                <p className="text-slate-500 dark:text-slate-400">No content available for this module.</p>
+              )}
+            </div>
+          </Card>
+
           {moduleLessons.length > 0 && (
             <Card>
               <div className="space-y-2">
                 <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-2">Lessons</h3>
                 <div className="space-y-2">
-                  {moduleLessons.sort((a, b) => a.orderIndex - b.orderIndex).map(lesson => (
+                  {moduleLessons.sort((a, b) => a.orderIndex - b.orderIndex).map((lesson, index) => (
                     <div
                       key={lesson.id}
                       className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer transition-all"
                       onClick={() => openLesson(lesson)}
                     >
+                      <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary font-bold text-sm">
+                        {index + 1}
+                      </div>
+
                       {getLessonIcon(lesson.contentType)}
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-slate-800 dark:text-slate-100 truncate">{lesson.title}</span>
-                          {lesson.contentType && (
-                            <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded capitalize whitespace-nowrap">
-                              {lesson.contentType}
-                            </span>
-                          )}
+                          <span className="font-medium text-slate-800 dark:text-slate-100 truncate">{lesson.description}</span>
                         </div>
                         {lesson.durationMinutes && (
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -457,18 +474,7 @@ export default function ProgramsPage() {
               </div>
             </Card>
           )}
-          {/* Module Content */}
-          <Card>
-            <div className="prose dark:prose-invert max-w-none">
-              {currentModule.content ? (
-                <div dangerouslySetInnerHTML={{ __html: currentModule.content }} />
-              ) : currentModule.description ? (
-                <p className="text-slate-700 dark:text-slate-300">{currentModule.description}</p>
-              ) : (
-                <p className="text-slate-500 dark:text-slate-400">No content available for this module.</p>
-              )}
-            </div>
-          </Card>
+
           <div className="flex items-center gap-3">
             {hasQuiz && !quizPassed && (
               <Button onClick={openModuleQuiz} disabled={actionLoading}>
@@ -490,6 +496,7 @@ export default function ProgramsPage() {
             )}
             {isCompleted && <Badge variant="success">Completed</Badge>}
           </div>
+
         </div>
       </DashboardLayout>
     );
@@ -635,12 +642,26 @@ export default function ProgramsPage() {
   if (view === 'detail' && selectedProgram && selectedEnrollment) {
     const modules = selectedProgram.modules || [];
     const sortedModules = [...modules].sort((a, b) => a.orderIndex - b.orderIndex);
+    console.log(selectedProgram.modules)
     const allModulesComplete = sortedModules.length > 0 && sortedModules.every(
       m => getModuleProgressForId(m.id)?.moduleStatus === 'completed'
     );
     const hasFinalQuiz = selectedProgram.quizzes?.some(q => q.quizType === 'final_quiz');
     const isNotStarted = selectedEnrollment.status === 'not_started' || selectedEnrollment.status === 'not_enrolled' || selectedEnrollment.status === 'enrolled';
     const isCompleted = selectedEnrollment.status === 'completed';
+
+    const getContentTypeIcon = (type: string) => {
+      switch (type) {
+        case "video":
+          return <Video className="h-5 w-5 text-blue-500" />;
+        case "file":
+          return <FileTextIcon className="h-5 w-5 text-orange-500" />;
+        case "mixed":
+          return <FolderOpen className="h-5 w-5 text-purple-500" />;
+        default:
+          return <FileText className="h-5 w-5 text-muted-foreground" />;
+      }
+    };
 
     return (
       <DashboardLayout>
@@ -660,7 +681,7 @@ export default function ProgramsPage() {
           {error && <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-sm text-red-600 dark:text-red-400">{error}</div>}
 
           {/* Progress */}
-          <Card>
+          <Card className='shadow-none'>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-600 dark:text-slate-400">Overall Progress</span>
@@ -694,26 +715,41 @@ export default function ProgramsPage() {
                   <div
                     key={mod.id}
                     onClick={() => !isNotStarted && openModule(mod)}
-                    className={`flex items-center gap-4 rounded-lg border p-4 transition-all ${isModComplete
-                        ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20'
-                        : isNotStarted
-                          ? 'border-slate-200 dark:border-slate-700 opacity-60'
-                          : 'border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer'
+                    className={`flex items-center gap-4 rounded-lg border p-4 transition-all bg-white ${isModComplete
+                      ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20'
+                      : isNotStarted
+                        ? 'border-slate-200 dark:border-slate-700 opacity-60'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer'
                       }`}
                   >
                     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${isModComplete
-                        ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400'
-                        : status === 'in_progress'
-                          ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                      ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400'
+                      : status === 'in_progress'
+                        ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                       }`}>
                       {isModComplete ? <CheckCircle className="h-5 w-5" /> : idx + 1}
                     </div>
+
+                    {/* Content type icon */}
+                    <div className="flex-shrink-0">
+                      {getContentTypeIcon(mod.contentType || '')}
+                    </div>
+
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-slate-800 dark:text-slate-100 truncate">{mod.title}</h4>
+                      {mod.description && (
+                        <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{mod.description}</p>
+                      )}
                       {mod.durationMinutes && (
                         <p className="text-xs text-slate-500 dark:text-slate-400">{mod.durationMinutes} min</p>
                       )}
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-muted-foreground capitalize">{mod.contentType}</span>
+                        {mod.requiresQuizPass && (
+                          <Badge className="text-xs py-0">Required</Badge>
+                        )}
+                      </div>
                     </div>
                     {mod.requiresQuizPass && (
                       <Badge variant={mp?.quizPassed ? 'success' : 'default'} className="text-xs shrink-0">
