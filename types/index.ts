@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Employee Dashboard Type Definitions
 
-export type UserRole = 'EMPLOYEE';
+export type UserRole = "EMPLOYEE";
 
 // ─── Employee Profile ───────────────────────────────────────────────
 export interface Employee {
@@ -16,11 +16,17 @@ export interface Employee {
   dateOfBirth?: string;
   phone?: string;
   joinedAt: string;
-  enrollmentStatus: 'active' | 'inactive' | 'suspended';
+  enrollmentStatus: "active" | "inactive" | "suspended";
 }
 
 // ─── Consent & Privacy ──────────────────────────────────────────────
-export type ConsentType = 'health_data' | 'vitals' | 'assessments' | 'appointments' | 'goals' | 'programs';
+export type ConsentType =
+  | "health_data"
+  | "vitals"
+  | "assessments"
+  | "appointments"
+  | "goals"
+  | "programs";
 
 export interface ConsentSetting {
   id: string;
@@ -44,7 +50,14 @@ export interface ConsentHistory {
 }
 
 // ─── Health Data ────────────────────────────────────────────────────
-export type VitalType = 'blood_pressure' | 'weight' | 'bmi' | 'glucose' | 'heart_rate' | 'temperature' | 'oxygen_saturation';
+export type VitalType =
+  | "blood_pressure"
+  | "weight"
+  | "bmi"
+  | "glucose"
+  | "heart_rate"
+  | "temperature"
+  | "oxygen_saturation";
 
 export interface VitalReading {
   id: string;
@@ -65,7 +78,7 @@ export interface HealthAssessment {
   title: string;
   score?: number;
   maxScore?: number;
-  status: 'pending' | 'completed' | 'cancelled';
+  status: "pending" | "completed" | "cancelled";
   completedAt?: string;
   results?: Record<string, any>;
   recommendations?: string[];
@@ -73,8 +86,14 @@ export interface HealthAssessment {
 }
 
 // ─── Goals & Progress ───────────────────────────────────────────────
-export type GoalCategory = 'exercise' | 'nutrition' | 'weight_management' | 'stress_management' | 'sleep' | 'other';
-export type GoalStatus = 'active' | 'completed' | 'paused' | 'cancelled';
+export type GoalCategory =
+  | "exercise"
+  | "nutrition"
+  | "weight_management"
+  | "stress_management"
+  | "sleep"
+  | "other";
+export type GoalStatus = "active" | "completed" | "paused" | "cancelled";
 
 export interface Goal {
   id: string;
@@ -105,9 +124,24 @@ export interface GoalProgress {
 }
 
 // ─── Programs & Learning ────────────────────────────────────────────
-export type ProgramStatus = 'not_started' | 'in_progress' | 'completed' | 'paused' | 'not_enrolled' | 'enrolled';
-export type ContentType = 'video' | 'article' | 'quiz' | 'exercise' | 'document' | 'file' | 'text' | 'image' | 'mixed';
-export type ModuleStatus = 'not_started' | 'in_progress' | 'completed';
+export type ProgramStatus =
+  | "not_started"
+  | "in_progress"
+  | "completed"
+  | "paused"
+  | "not_enrolled"
+  | "enrolled";
+export type ContentType =
+  | "video"
+  | "article"
+  | "quiz"
+  | "exercise"
+  | "document"
+  | "file"
+  | "text"
+  | "image"
+  | "mixed";
+export type ModuleStatus = "not_started" | "in_progress" | "completed";
 
 export interface Program {
   id: string;
@@ -162,7 +196,7 @@ export interface ProgramQuiz {
   moduleId?: string;
   title: string;
   description?: string;
-  quizType: 'module_quiz' | 'final_quiz';
+  quizType: "module_quiz" | "final_quiz";
   passingScore: number;
   maxAttempts: number;
   timeLimitMinutes?: number;
@@ -173,7 +207,7 @@ export interface QuizQuestion {
   id: string;
   quizId: string;
   questionText: string;
-  questionType: 'multiple_choice' | 'true_false';
+  questionType: "multiple_choice" | "true_false";
   points: number;
   orderIndex: number;
   answers: QuizAnswer[];
@@ -236,9 +270,20 @@ export interface ProgramContent {
 }
 
 // ─── Appointments ───────────────────────────────────────────────────
-export type AppointmentType = 'coaching' | 'mental_health' | 'nutrition' | 'general' | 'consultation';
-export type AppointmentStatus = 'scheduled' | 'confirmed' | 'rescheduled' | 'cancelled' | 'completed' | 'no_show';
-export type ProviderType = 'user' | 'organization_admin';
+export type AppointmentType =
+  | "coaching"
+  | "mental_health"
+  | "nutrition"
+  | "general"
+  | "consultation";
+export type AppointmentStatus =
+  | "scheduled"
+  | "confirmed"
+  | "rescheduled"
+  | "cancelled"
+  | "completed"
+  | "no_show";
+export type ProviderType = "user" | "organization_admin";
 
 export interface Provider {
   id: string;
@@ -279,8 +324,14 @@ export interface AppointmentBooking {
 }
 
 // ─── Notifications ──────────────────────────────────────────────────
-export type NotificationType = 'appointment' | 'goal' | 'program' | 'message' | 'system' | 'meal_plan';
-export type NotificationPriority = 'low' | 'normal' | 'high';
+export type NotificationType =
+  | "appointment"
+  | "goal"
+  | "program"
+  | "message"
+  | "system"
+  | "meal_plan";
+export type NotificationPriority = "low" | "normal" | "high";
 
 export interface Notification {
   id: string;
@@ -303,12 +354,7 @@ export interface DashboardOverview {
     completed: number;
     programs: ProgramEnrollment[];
   };
-  latestVitals: {
-    vitalType: VitalType;
-    value: string | number;
-    unit: string;
-    recordedAt: string;
-  }[];
+  latestVitals: Record<string, any>;
   upcomingAppointments: Appointment[];
   unreadNotifications: number;
   pendingGoals: {
