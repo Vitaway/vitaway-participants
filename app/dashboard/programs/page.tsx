@@ -459,7 +459,7 @@ export default function ProgramsPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-slate-800 dark:text-slate-100 truncate">{lesson.title}</span>
-                          <span className="font-medium text-slate-800 dark:text-slate-100 truncate">{lesson.description}</span>
+                          {lesson.description && (<span className="font-medium text-slate-800 dark:text-slate-100 truncate" dangerouslySetInnerHTML={{ __html: lesson.description.slice(0, 100) + '...' }} />)}
                         </div>
                         {lesson.durationMinutes && (
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -623,7 +623,7 @@ export default function ProgramsPage() {
           {/* Description if no content */}
           {!currentLesson.content && currentLesson.description && (
             <Card>
-              <p className="text-slate-700 dark:text-slate-300">{currentLesson.description}</p>
+              <p className="text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{ __html: currentLesson.description }} />
             </Card>
           )}
 
@@ -672,7 +672,9 @@ export default function ProgramsPage() {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{selectedProgram.title}</h1>
-              <p className="mt-1 text-slate-600 dark:text-slate-400">{selectedProgram.description}</p>
+              {selectedProgram.description && (<p className="mt-1 text-slate-600 dark:text-slate-400"
+                dangerouslySetInnerHTML={{ __html: selectedProgram.description }}
+              />)}
             </div>
             <Badge variant={isCompleted ? 'success' : selectedEnrollment.status === 'in_progress' ? 'warning' : 'default'}>
               {selectedEnrollment.status === 'not_enrolled' ? 'Available' : selectedEnrollment.status.replace(/_/g, ' ')}
@@ -881,9 +883,9 @@ export default function ProgramsPage() {
                           <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 truncate">
                             {program.title}
                           </h3>
-                          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
-                            {program.description}
-                          </p>
+                          {program.description && (<p className="mt-1 text-sm text-slate-600 dark:text-slate-400 line-clamp-2"
+                            dangerouslySetInnerHTML={{ __html: program.description }}
+                          />)}
                         </div>
                         <Badge variant={status === 'completed' ? 'success' : status === 'in_progress' ? 'warning' : status === 'not_enrolled' ? 'default' : 'default'}>
                           {status === 'not_enrolled' ? 'Available' : status.replace(/_/g, ' ')}
