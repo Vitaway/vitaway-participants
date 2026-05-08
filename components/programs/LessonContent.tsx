@@ -2,6 +2,7 @@
 
 import { VideoPlayer } from "./VideoPlayer";
 import { FileViewer } from "./FileViewer";
+import { RichTextContent } from "@/components/ui/rich-text-content";
 
 interface LessonContentProps {
   contentType?: string;
@@ -46,9 +47,9 @@ export function LessonContent({
       {/* Text/HTML Content */}
       {(contentType === "text" || contentType === "mixed") && content && (
         <div className="rounded-lg border bg-white dark:bg-slate-900 p-6">
-          <div
-            className="prose prose-sm dark:prose-invert max-w-none text-slate-800 dark:text-slate-200"
-            dangerouslySetInnerHTML={{ __html: content }}
+          <RichTextContent
+            html={content}
+            className="text-slate-800 dark:text-slate-200"
           />
         </div>
       )}

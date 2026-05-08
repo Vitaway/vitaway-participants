@@ -148,9 +148,13 @@ export interface Program {
   title: string;
   description: string;
   category: string;
+  status?: ProgramStatus | string;
   imageUrl?: string;
   durationMinutes?: number;
+  estimatedDurationHours?: number;
   totalContent: number;
+  learningObjectives?: string;
+  difficultyLevel?: "beginner" | "intermediate" | "advanced" | string;
   createdAt: string;
   modules?: ProgramModule[];
   quizzes?: ProgramQuiz[];
@@ -170,6 +174,7 @@ export interface ProgramLesson {
   fileType?: string;
   durationMinutes?: number;
   orderIndex: number;
+  isRequired?: boolean;
 }
 
 export interface ProgramModule {
@@ -185,6 +190,7 @@ export interface ProgramModule {
   fileType?: string;
   durationMinutes?: number;
   orderIndex: number;
+  isRequired?: boolean;
   requiresQuizPass?: boolean;
   quiz?: ProgramQuiz;
   lessons?: ProgramLesson[];
@@ -200,6 +206,7 @@ export interface ProgramQuiz {
   passingScore: number;
   maxAttempts: number;
   timeLimitMinutes?: number;
+  isRequired?: boolean;
   questions?: QuizQuestion[];
 }
 

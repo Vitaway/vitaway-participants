@@ -11,6 +11,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { RichTextContent } from "@/components/ui/rich-text-content";
 
 interface FileViewerProps {
   fileUrl: string;
@@ -143,9 +144,10 @@ export function FileViewer({
         </div>
 
         {description && (
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-3">
-            {description}
-          </p>
+          <RichTextContent
+            html={description}
+            className="mt-3 text-sm text-slate-600 dark:text-slate-400"
+          />
         )}
 
         {/* Preview for images and PDFs */}
@@ -166,7 +168,7 @@ export function FileViewer({
                     PDF preview not available in browser
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                    Click "Preview" or "Download" to view the PDF
+                    Click Preview or Download to view the PDF
                   </p>
                 </div>
               </div>

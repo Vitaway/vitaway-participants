@@ -8,6 +8,7 @@ import {
   FileText, Award, AlertCircle, ChevronRight, Loader2, Video, File,
   FileTextIcon,
   FolderOpen,
+  Target,
 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/dashboard-layout';
 import { Card } from '@/components/ui/card';
@@ -15,12 +16,14 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ProgressBar } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { LessonContent } from '@/components/programs/LessonContent';
+import { RichTextContent } from '@/components/ui/rich-text-content';
 import {
   getEnrolledPrograms, getProgram, startProgram,
   getModule, completeModule, getModuleQuiz, submitModuleQuiz,
   getFinalQuiz, submitFinalQuiz, getModuleLessons,
 } from '@/lib/api';
-import { formatDate } from '@/lib/utils';
+import { formatDate, htmlToPlainText } from '@/lib/utils';
 import type {
   ProgramEnrollment, Program, ProgramModule, ProgramQuiz,
   ModuleProgress, QuizSubmissionResult, ProgramLesson,
@@ -106,7 +109,13 @@ export default function ProgramsPage() {
       // Debug: Log programId and moduleId
       console.log('Fetching lessons for programId:', selectedEnrollment.programId, 'moduleId:', mod.id);
       const res = await getModule(selectedEnrollment.programId, mod.id);
-      setCurrentModule(res.module);
+      console.log(res.module)
+      setCurrentModule({
+        ...mod,
+        ...res.module,
+        quiz: res.module.quiz ?? mod.quiz,
+        lessons: res.module.lessons?.length ? res.module.lessons : mod.lessons,
+      });
       setCurrentModuleProgress(res.progress);
       // Fetch lessons for this module
       const lessons = await getModuleLessons(selectedEnrollment.programId, mod.id);
@@ -137,13 +146,11 @@ export default function ProgramsPage() {
       setSelectedEnrollment(prev => prev ? { ...prev, progressPercentage: res.completionPercentage } : null);
       setModuleProgress(res.progress);
       setView('detail');
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const apiError = e as { response?: { status?: number; data?: { message?: string } } };
       if (
-        typeof e === 'object' &&
-        e !== null &&
-        'response' in e &&
-        e.response?.status === 422 &&
-        e.response?.data?.message?.includes('requires quiz but none found')
+        apiError.response?.status === 422 &&
+        apiError.response?.data?.message?.includes('requires quiz but none found')
       ) {
         setError('This module is configured to require a quiz, but no quiz has been set up yet. Please contact your administrator.');
       } else {
@@ -169,20 +176,16 @@ export default function ProgramsPage() {
       setQuizAnswers({});
       setQuizResult(null);
       setView('quiz');
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const apiError = e as { response?: { status?: number; data?: { message?: string } } };
       if (
-        typeof e === 'object' &&
-        e !== null &&
-        'response' in e &&
-        e.response?.status === 422 &&
-        e.response?.data?.message?.includes('requires quiz but none found')
+        apiError.response?.status === 422 &&
+        apiError.response?.data?.message?.includes('requires quiz but none found')
       ) {
         setError('This module is configured to require a quiz, but no quiz has been set up yet. Please contact your administrator.');
       } else if (
-        typeof e === 'object' &&
-        e !== null &&
-        'response' in e &&
-        (e.response?.status === 404 || (e.response?.data?.message && e.response.data.message.includes('No quiz')))
+        apiError.response?.status === 404 ||
+        apiError.response?.data?.message?.includes('No quiz')
       ) {
         setError('No quiz available for this module.');
       } else {
@@ -267,6 +270,21 @@ export default function ProgramsPage() {
 
   const getModuleProgressForId = (moduleId: string) =>
     moduleProgress.find(p => p.moduleId === moduleId);
+
+  const getContentTypeIcon = (type?: string) => {
+    switch (type) {
+      case 'video':
+        return <Video className="h-5 w-5 text-blue-500 dark:text-blue-400" />;
+      case 'file':
+        return <FileTextIcon className="h-5 w-5 text-orange-500 dark:text-orange-400" />;
+      case 'mixed':
+        return <FolderOpen className="h-5 w-5 text-purple-500 dark:text-purple-400" />;
+      case 'text':
+        return <BookOpen className="h-5 w-5 text-green-500 dark:text-green-400" />;
+      default:
+        return <FileText className="h-5 w-5 text-muted-foreground" />;
+    }
+  };
 
   // Helper function to get icon for lesson content type
   const getLessonIcon = (contentType?: string) => {
@@ -409,6 +427,20 @@ export default function ProgramsPage() {
     const isCompleted = progress?.moduleStatus === 'completed';
     const hasQuiz = !!currentModule.quiz;
     const quizPassed = progress?.quizPassed;
+    const moduleDetails = [
+      { label: 'Content type', value: currentModule.contentType || 'text' },
+      { label: 'Requirement', value: currentModule.isRequired ? 'Required' : 'Optional' },
+      { label: 'Position', value: String(currentModule.orderIndex || 0) },
+      ...(currentModule.durationMinutes
+        ? [{ label: 'Estimated time', value: `${currentModule.durationMinutes} minutes` }]
+        : []),
+      ...(currentModule.fileType
+        ? [{ label: 'File type', value: currentModule.fileType.toUpperCase() }]
+        : []),
+      { label: 'Quiz pass', value: currentModule.requiresQuizPass ? 'Required to complete' : 'Not required' },
+      { label: 'Lessons', value: String(moduleLessons.length) },
+      { label: 'Quizzes', value: hasQuiz ? '1' : '0' },
+    ];
 
     return (
       <DashboardLayout>
@@ -417,25 +449,43 @@ export default function ProgramsPage() {
             <ArrowLeft className="h-4 w-4" /> Back to Modules
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{currentModule.title}</h1>
-            {currentModule.durationMinutes && (
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                <Clock className="h-4 w-4" /> {currentModule.durationMinutes} min
-              </p>
-            )}
+            <div className="flex items-center gap-3">
+              {getContentTypeIcon(currentModule.contentType)}
+              <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{currentModule.title}</h1>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Badge variant="info" className="capitalize">{currentModule.contentType || 'text'}</Badge>
+              <Badge variant={currentModule.isRequired ? 'warning' : 'default'}>
+                {currentModule.isRequired ? 'Required' : 'Optional'}
+              </Badge>
+              {currentModule.requiresQuizPass && (
+                <Badge variant="success">Quiz pass required</Badge>
+              )}
+              {currentModule.durationMinutes && (
+                <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <Clock className="h-4 w-4" /> {currentModule.durationMinutes} min
+                </span>
+              )}
+            </div>
           </div>
+
           {error && <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-sm text-red-600 dark:text-red-400">{error}</div>}
 
-          {/* Module Content */}
           <Card>
-            <div className="prose dark:prose-invert max-w-none">
-              {currentModule.content ? (
-                <div dangerouslySetInnerHTML={{ __html: currentModule.content }} />
-              ) : currentModule.description ? (
-                <p className="text-slate-700 dark:text-slate-300">{currentModule.description}</p>
-              ) : (
-                <p className="text-slate-500 dark:text-slate-400">No content available for this module.</p>
-              )}
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Module Details</h2>
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {moduleDetails.map((detail) => (
+                  <div key={detail.label} className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                      {detail.label}
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-100 capitalize">
+                      {detail.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </Card>
 
@@ -459,17 +509,53 @@ export default function ProgramsPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-slate-800 dark:text-slate-100 truncate">{lesson.title}</span>
-                          {lesson.description && (<span className="font-medium text-slate-800 dark:text-slate-100 truncate" dangerouslySetInnerHTML={{ __html: lesson.description.slice(0, 100) + '...' }} />)}
+                          <Badge variant={lesson.isRequired ? 'warning' : 'default'}>
+                            {lesson.isRequired ? 'Required' : 'Optional'}
+                          </Badge>
                         </div>
+                        {lesson.description && (
+                          <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
+                            {htmlToPlainText(lesson.description)}
+                          </p>
+                        )}
                         {lesson.durationMinutes && (
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                             <Clock className="h-3 w-3 inline mr-1" />{lesson.durationMinutes} min
                           </p>
                         )}
+                        <div className="mt-1 flex items-center gap-3">
+                          <span className="text-xs text-muted-foreground capitalize">{lesson.contentType || 'text'}</span>
+                          {lesson.fileType && (
+                            <span className="text-xs text-muted-foreground uppercase">{lesson.fileType}</span>
+                          )}
+                        </div>
                       </div>
                       <ChevronRight className="h-4 w-4 text-slate-400 dark:text-slate-500 shrink-0" />
                     </div>
                   ))}
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {hasQuiz && currentModule.quiz && (
+            <Card>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge variant="info">Module Quiz</Badge>
+                  {currentModule.quiz.isRequired && <Badge variant="warning">Required</Badge>}
+                  {quizPassed && <Badge variant="success">Passed</Badge>}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-800 dark:text-slate-100">{currentModule.quiz.title}</h3>
+                  {currentModule.quiz.description && (
+                    <p className="text-sm text-slate-600 dark:text-slate-400">{currentModule.quiz.description}</p>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                  <span>Passing score: {currentModule.quiz.passingScore}%</span>
+                  <span>Max attempts: {currentModule.quiz.maxAttempts}</span>
+                  {currentModule.quiz.timeLimitMinutes && <span>Time limit: {currentModule.quiz.timeLimitMinutes} min</span>}
                 </div>
               </div>
             </Card>
@@ -504,9 +590,17 @@ export default function ProgramsPage() {
 
   // ─── Lesson Content View ─────────────────────────────────────────
   if (view === 'lesson' && currentLesson) {
-    const isVideoUrl = (url: string) => /\.(mp4|webm|ogg|mov)$/i.test(url) || url.includes('youtube') || url.includes('vimeo');
-    const isPdfUrl = (url: string) => /\.pdf$/i.test(url);
-    const isImageUrl = (url: string) => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+    const lessonDetails = [
+      { label: 'Content type', value: currentLesson.contentType || 'text' },
+      { label: 'Requirement', value: currentLesson.isRequired ? 'Required' : 'Optional' },
+      { label: 'Position', value: String(currentLesson.orderIndex || 0) },
+      ...(currentLesson.durationMinutes
+        ? [{ label: 'Estimated time', value: `${currentLesson.durationMinutes} minutes` }]
+        : []),
+      ...(currentLesson.fileType
+        ? [{ label: 'File type', value: currentLesson.fileType.toUpperCase() }]
+        : []),
+    ];
 
     return (
       <DashboardLayout>
@@ -517,13 +611,19 @@ export default function ProgramsPage() {
           <div>
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{currentLesson.title}</h1>
-                {currentLesson.contentType && (
-                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                    {getLessonIcon(currentLesson.contentType)}
-                    <span className="capitalize">{currentLesson.contentType} Content</span>
-                  </p>
-                )}
+                <div className="flex items-center gap-3">
+                  {getLessonIcon(currentLesson.contentType)}
+                  <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{currentLesson.title}</h1>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Badge variant="info" className="capitalize">{currentLesson.contentType || 'text'}</Badge>
+                  <Badge variant={currentLesson.isRequired ? 'warning' : 'default'}>
+                    {currentLesson.isRequired ? 'Required' : 'Optional'}
+                  </Badge>
+                  {currentLesson.fileType && (
+                    <Badge variant="default" className="uppercase">{currentLesson.fileType}</Badge>
+                  )}
+                </div>
               </div>
               {currentLesson.durationMinutes && (
                 <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1 whitespace-nowrap">
@@ -533,106 +633,30 @@ export default function ProgramsPage() {
             </div>
           </div>
 
-          {/* Render content based on type */}
-          {/* Video Content */}
-          {(currentLesson.contentType === 'video' || currentLesson.videoUrl) && currentLesson.videoUrl && (
-            <Card>
-              {isVideoUrl(currentLesson.videoUrl) && (
-                <div className="relative w-full bg-black rounded-lg overflow-hidden" style={{ paddingBottom: '56.25%' }}>
-                  {currentLesson.videoUrl.includes('youtube.com') || currentLesson.videoUrl.includes('youtu.be') ? (
-                    <iframe
-                      className="absolute inset-0 w-full h-full"
-                      src={currentLesson.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
-                      title={currentLesson.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : currentLesson.videoUrl.includes('vimeo.com') ? (
-                    <iframe
-                      className="absolute inset-0 w-full h-full"
-                      src={currentLesson.videoUrl}
-                      title={currentLesson.title}
-                      allow="autoplay; fullscreen; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      className="absolute inset-0 w-full h-full"
-                      controls
-                      src={currentLesson.videoUrl}
-                      title={currentLesson.title}
-                    />
-                  )}
-                </div>
-              )}
-            </Card>
-          )}
-
-          {/* File Content */}
-          {(currentLesson.contentType === 'file' || currentLesson.fileUrl) && currentLesson.fileUrl && (
-            <Card>
-              {isPdfUrl(currentLesson.fileUrl) ? (
-                <div className="flex flex-col gap-4">
-                  <iframe
-                    className="w-full h-96 rounded-lg border border-slate-200 dark:border-slate-700"
-                    src={currentLesson.fileUrl}
-                    title={currentLesson.title}
-                  />
-                  <a
-                    href={currentLesson.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 flex items-center gap-1"
-                  >
-                    <FileText className="h-4 w-4" /> Download PDF
-                  </a>
-                </div>
-              ) : isImageUrl(currentLesson.fileUrl) ? (
-                <img
-                  src={currentLesson.fileUrl}
-                  alt={currentLesson.title}
-                  className="w-full h-auto rounded-lg"
-                />
-              ) : (
-                <div className="flex flex-col gap-4">
-                  <p className="text-slate-600 dark:text-slate-400">
-                    File: <span className="font-mono text-sm">{currentLesson.fileUrl.split('/').pop()}</span>
+          <Card>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {lessonDetails.map((detail) => (
+                <div key={detail.label} className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 p-4">
+                  <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    {detail.label}
                   </p>
-                  <a
-                    href={currentLesson.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
-                  >
-                    <File className="h-4 w-4" /> Download File
-                  </a>
+                  <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-100 capitalize">
+                    {detail.value}
+                  </p>
                 </div>
-              )}
-            </Card>
-          )}
+              ))}
+            </div>
+          </Card>
 
-          {/* Text/HTML Content */}
-          {currentLesson.content && (
-            <Card>
-              <div className="prose dark:prose-invert max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: currentLesson.content }} />
-              </div>
-            </Card>
-          )}
-
-          {/* Description if no content */}
-          {!currentLesson.content && currentLesson.description && (
-            <Card>
-              <p className="text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{ __html: currentLesson.description }} />
-            </Card>
-          )}
-
-          {/* No content message */}
-          {!currentLesson.content && !currentLesson.description && !currentLesson.videoUrl && !currentLesson.fileUrl && (
-            <Card>
-              <p className="text-slate-500 dark:text-slate-400">No content available for this lesson.</p>
-            </Card>
-          )}
+          <LessonContent
+            contentType={currentLesson.contentType}
+            content={currentLesson.content}
+            videoUrl={currentLesson.videoUrl}
+            fileUrl={currentLesson.fileUrl}
+            fileType={currentLesson.fileType}
+            title={currentLesson.title}
+            description={currentLesson.description}
+          />
         </div>
       </DashboardLayout>
     );
@@ -646,22 +670,27 @@ export default function ProgramsPage() {
     const allModulesComplete = sortedModules.length > 0 && sortedModules.every(
       m => getModuleProgressForId(m.id)?.moduleStatus === 'completed'
     );
-    const hasFinalQuiz = selectedProgram.quizzes?.some(q => q.quizType === 'final_quiz');
+    const finalQuizzes = (selectedProgram.quizzes || []).filter(q => q.quizType === 'final_quiz');
+    const hasFinalQuiz = finalQuizzes.length > 0;
     const isNotStarted = selectedEnrollment.status === 'not_started' || selectedEnrollment.status === 'not_enrolled' || selectedEnrollment.status === 'enrolled';
     const isCompleted = selectedEnrollment.status === 'completed';
-
-    const getContentTypeIcon = (type: string) => {
-      switch (type) {
-        case "video":
-          return <Video className="h-5 w-5 text-blue-500" />;
-        case "file":
-          return <FileTextIcon className="h-5 w-5 text-orange-500" />;
-        case "mixed":
-          return <FolderOpen className="h-5 w-5 text-purple-500" />;
-        default:
-          return <FileText className="h-5 w-5 text-muted-foreground" />;
-      }
-    };
+    const programDetails = [
+      { label: 'Status', value: selectedEnrollment.status === 'not_enrolled' ? 'Available' : selectedEnrollment.status.replace(/_/g, ' ') },
+      { label: 'Difficulty', value: selectedProgram.difficultyLevel || 'Not set' },
+      {
+        label: 'Estimated duration',
+        value: selectedProgram.estimatedDurationHours
+          ? `${selectedProgram.estimatedDurationHours} hours`
+          : selectedProgram.durationMinutes
+            ? `${selectedProgram.durationMinutes} minutes`
+            : 'Not set',
+      },
+      { label: 'Modules', value: String(sortedModules.length) },
+      { label: 'Program quizzes', value: String(finalQuizzes.length) },
+      { label: 'Progress', value: `${Math.round(selectedEnrollment.progressPercentage)}%` },
+      { label: 'Enrolled', value: formatDate(selectedEnrollment.enrolledAt) },
+      { label: 'Started', value: selectedEnrollment.startedAt ? formatDate(selectedEnrollment.startedAt) : 'Not started' },
+    ];
 
     return (
       <DashboardLayout>
@@ -672,15 +701,79 @@ export default function ProgramsPage() {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{selectedProgram.title}</h1>
-              {selectedProgram.description && (<p className="mt-1 text-slate-600 dark:text-slate-400"
-                dangerouslySetInnerHTML={{ __html: selectedProgram.description }}
-              />)}
+              {selectedProgram.description && (
+                <RichTextContent
+                  html={selectedProgram.description}
+                  className="mt-1 text-slate-600 dark:text-slate-400"
+                />
+              )}
             </div>
             <Badge variant={isCompleted ? 'success' : selectedEnrollment.status === 'in_progress' ? 'warning' : 'default'}>
               {selectedEnrollment.status === 'not_enrolled' ? 'Available' : selectedEnrollment.status.replace(/_/g, ' ')}
             </Badge>
           </div>
           {error && <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-sm text-red-600 dark:text-red-400">{error}</div>}
+
+          <Card>
+            <div className="flex flex-col gap-6 lg:flex-row">
+              {selectedProgram.imageUrl && (
+                <img
+                  src={selectedProgram.imageUrl}
+                  alt={selectedProgram.title}
+                  className="h-48 w-full rounded-xl object-cover lg:h-40 lg:w-64"
+                />
+              )}
+              <div className="flex-1 space-y-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  {selectedProgram.difficultyLevel && (
+                    <Badge variant="default" className="capitalize">
+                      {selectedProgram.difficultyLevel}
+                    </Badge>
+                  )}
+                  {selectedProgram.estimatedDurationHours && (
+                    <Badge variant="info">
+                      {selectedProgram.estimatedDurationHours}h estimated
+                    </Badge>
+                  )}
+                  <Badge variant="default">
+                    {sortedModules.length} module{sortedModules.length === 1 ? '' : 's'}
+                  </Badge>
+                  {finalQuizzes.length > 0 && (
+                    <Badge variant="success">
+                      {finalQuizzes.length} quiz{finalQuizzes.length === 1 ? '' : 'zes'}
+                    </Badge>
+                  )}
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  {programDetails.map((detail) => (
+                    <div key={detail.label} className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 p-4">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        {detail.label}
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-800 dark:text-slate-100 capitalize">
+                        {detail.value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {selectedProgram.learningObjectives && (
+            <Card>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+                  <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Learning Objectives</h2>
+                </div>
+                <RichTextContent
+                  html={selectedProgram.learningObjectives}
+                  className="text-slate-700 dark:text-slate-300"
+                />
+              </div>
+            </Card>
+          )}
 
           {/* Progress */}
           <Card className='shadow-none'>
@@ -741,15 +834,20 @@ export default function ProgramsPage() {
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-slate-800 dark:text-slate-100 truncate">{mod.title}</h4>
                       {mod.description && (
-                        <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{mod.description}</p>
-                      )}
-                      {mod.durationMinutes && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{mod.durationMinutes} min</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
+                          {htmlToPlainText(mod.description)}
+                        </p>
                       )}
                       <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-muted-foreground capitalize">{mod.contentType}</span>
+                        <span className="text-xs text-muted-foreground capitalize">{mod.contentType || 'text'}</span>
+                        <Badge variant={mod.isRequired ? 'warning' : 'default'}>
+                          {mod.isRequired ? 'Required' : 'Optional'}
+                        </Badge>
+                        {mod.durationMinutes && (
+                          <span className="text-xs text-slate-500 dark:text-slate-400">{mod.durationMinutes} min</span>
+                        )}
                         {mod.requiresQuizPass && (
-                          <Badge className="text-xs py-0">Required</Badge>
+                          <Badge variant="success" className="text-xs py-0">Quiz pass required</Badge>
                         )}
                       </div>
                     </div>
@@ -765,7 +863,66 @@ export default function ProgramsPage() {
             </div>
           </div>
 
-          {/* Final Quiz */}
+          {/* Program Quizzes */}
+          {hasFinalQuiz && (
+            <Card>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-slate-800 dark:text-slate-100">Program Quizzes</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Final assessments published in the admin system appear here for participants.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  {finalQuizzes.map((quiz) => {
+                    const unlocked = allModulesComplete && !isCompleted;
+                    return (
+                      <div
+                        key={quiz.id}
+                        className="rounded-lg border border-slate-200 dark:border-slate-700 p-4"
+                      >
+                        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="info">Final Quiz</Badge>
+                              {quiz.isRequired && <Badge variant="warning">Required</Badge>}
+                              {isCompleted && <Badge variant="success">Program Completed</Badge>}
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-slate-800 dark:text-slate-100">{quiz.title}</h4>
+                              {quiz.description && (
+                                <p className="text-sm text-slate-600 dark:text-slate-400">{quiz.description}</p>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                              <span>Passing score: {quiz.passingScore}%</span>
+                              <span>Max attempts: {quiz.maxAttempts}</span>
+                              {quiz.timeLimitMinutes && <span>Time limit: {quiz.timeLimitMinutes} min</span>}
+                            </div>
+                            {!allModulesComplete && (
+                              <p className="text-sm text-amber-600 dark:text-amber-400">
+                                Complete all modules to unlock this quiz.
+                              </p>
+                            )}
+                          </div>
+
+                          {!isCompleted && (
+                            <Button onClick={openFinalQuiz} disabled={!unlocked || actionLoading}>
+                              {actionLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                              {unlocked ? 'Take Final Quiz' : 'Locked'}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Final Quiz CTA */}
           {hasFinalQuiz && allModulesComplete && !isCompleted && (
             <Card>
               <div className="flex items-center justify-between">
@@ -774,8 +931,8 @@ export default function ProgramsPage() {
                     <Award className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-800 dark:text-slate-100">Final Assessment</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">Complete the final quiz to finish this program</p>
+                    <h3 className="font-semibold text-slate-800 dark:text-slate-100">Final Assessment Unlocked</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">You can now take the final quiz to finish this program.</p>
                   </div>
                 </div>
                 <Button onClick={openFinalQuiz} disabled={actionLoading}>
@@ -883,9 +1040,11 @@ export default function ProgramsPage() {
                           <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 truncate">
                             {program.title}
                           </h3>
-                          {program.description && (<p className="mt-1 text-sm text-slate-600 dark:text-slate-400 line-clamp-2"
-                            dangerouslySetInnerHTML={{ __html: program.description }}
-                          />)}
+                          {program.description && (
+                            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+                              {htmlToPlainText(program.description)}
+                            </p>
+                          )}
                         </div>
                         <Badge variant={status === 'completed' ? 'success' : status === 'in_progress' ? 'warning' : status === 'not_enrolled' ? 'default' : 'default'}>
                           {status === 'not_enrolled' ? 'Available' : status.replace(/_/g, ' ')}

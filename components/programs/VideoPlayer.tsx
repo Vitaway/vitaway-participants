@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Play, AlertCircle, Download } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { RichTextContent } from "@/components/ui/rich-text-content";
 
 interface VideoPlayerProps {
   videoUrl: string;
@@ -16,7 +17,6 @@ export function VideoPlayer({
   videoUrl,
   title,
   description,
-  provider = "auto",
 }: VideoPlayerProps) {
   const [error, setError] = useState<string | null>(null);
 
@@ -58,7 +58,7 @@ export function VideoPlayer({
 
       // If no provider is detected, try as direct URL
       return { embedUrl: url, type: "direct" };
-    } catch (err) {
+    } catch {
       setError("Invalid video URL format");
       return { embedUrl: "", type: "unknown" };
     }
@@ -102,9 +102,10 @@ export function VideoPlayer({
           </Button>
         </div>
         {description && (
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            {description}
-          </p>
+          <RichTextContent
+            html={description}
+            className="text-sm text-slate-600 dark:text-slate-400"
+          />
         )}
         <div className="relative w-full bg-black rounded-lg overflow-hidden">
           {type === "direct" ? (
